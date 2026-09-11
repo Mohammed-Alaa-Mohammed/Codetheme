@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-CodeCanvas Pro v6.3 - محرر صور الأكواد الاحترافي
+CodeCanvas Pro v6.4 - محرر صور الأكواد الاحترافي
 Developed by Muhammed Alaa © 2026
 """
 from pywebio import start_server
 from pywebio.input import input, TEXT, textarea, select, radio
 from pywebio.output import (
     put_html, put_markdown, put_buttons, put_info, put_error,
-    clear, toast, use_scope, put_collapse
+    put_success, clear, toast, use_scope, put_collapse
 )
 from pywebio.session import set_env, run_js
 import base64
@@ -20,12 +20,16 @@ from datetime import datetime
 # ═══════════════════════════════════════════════════════════
 
 SITE_NAME = "CodeCanvas Pro — محرر صور الأكواد"
-SITE_DESC = "حوّل أكوادك إلى صور احترافية بـ 25 ثيماً و 15 لغة"
-SITE_VERSION = "6.3"
+SITE_VERSION = "6.4"
 AUTHOR = "Muhammed Alaa"
 COPYRIGHT = f"{AUTHOR} © 2026"
 
 SITE_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect x="4" y="4" width="56" height="56" rx="14" fill="url(#lg1)"/><rect x="11" y="15" width="42" height="34" rx="4" fill="#ffffff" opacity="0.12"/><rect x="11" y="15" width="42" height="9" rx="4" fill="#ffffff" opacity="0.22"/><circle cx="15" cy="19.5" r="1.6" fill="#ff5f56"/><circle cx="20" cy="19.5" r="1.6" fill="#ffbd2e"/><circle cx="25" cy="19.5" r="1.6" fill="#27c93f"/><path d="M 18 29 L 22 33 L 18 37" stroke="#00ff9f" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="27" y1="37" x2="36" y2="37" stroke="#00ff9f" stroke-width="2.5" stroke-linecap="round"/><circle cx="44" cy="32" r="3.5" fill="#f92672"/><circle cx="48" cy="27" r="2.5" fill="#e6db74"/><circle cx="47" cy="39" r="2.5" fill="#66d9ef"/></svg>'
+
+
+# ═══════════════════════════════════════════════════════════
+#                    🎯 مكتبة الأيقونات
+# ═══════════════════════════════════════════════════════════
 
 ICONS = {
     "code": '<path d="M 8 6 L 2 12 L 8 18 M 16 6 L 22 12 L 16 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
@@ -38,10 +42,15 @@ ICONS = {
     "heart": '<path d="M 12 21 C 12 21 3 14 3 8.5 C 3 5.5 5.5 3 8.5 3 C 10.5 3 12 4.5 12 4.5 C 12 4.5 13.5 3 15.5 3 C 18.5 3 21 5.5 21 8.5 C 21 14 12 21 12 21 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
 }
 
+
 def icon(name, size=20, color="currentColor"):
     path = ICONS.get(name, ICONS["code"]).replace("currentColor", color)
     return f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 24 24" style="vertical-align:middle;display:inline-block;flex-shrink:0;">{path}</svg>'
 
+
+# ═══════════════════════════════════════════════════════════
+#                    🎨 الثيمات
+# ═══════════════════════════════════════════════════════════
 
 THEMES = {
     "Monokai": {"bg": "#272822", "text": "#f8f8f2", "comment": "#75715e", "keyword": "#f92672", "string": "#e6db74", "number": "#ae81ff", "function": "#a6e22e", "class": "#66d9ef", "accent": "#fd971f", "window_bg": "#3e3d32"},
@@ -128,6 +137,10 @@ LANGUAGES = {
     "YAML": {"keywords": {'true','false','null','yes','no'}, "builtins": set(), "comment": "#", "strings": ['"', "'"], "filename": "config.yaml"},
 }
 
+
+# ═══════════════════════════════════════════════════════════
+#                    🎨 التلوين
+# ═══════════════════════════════════════════════════════════
 
 def esc(t):
     return html_module.escape(t)
@@ -378,7 +391,12 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
     return ''.join(parts), W, H
 
 
+# ═══════════════════════════════════════════════════════════
+#                    🎨 الواجهة
+# ═══════════════════════════════════════════════════════════
+
 def setup_site():
+    """إعداد الموقع — بدون description (غير مدعوم في PyWebIO)"""
     set_env(title=SITE_NAME, auto_scroll_bottom=True)
 
 
@@ -430,6 +448,10 @@ def section_title(icon_name, text, color="#667eea", subtitle=""):
         {sub}
     </div>''')
 
+
+# ═══════════════════════════════════════════════════════════
+#                    🎯 التطبيق
+# ═══════════════════════════════════════════════════════════
 
 def main():
     setup_site()
@@ -544,60 +566,86 @@ def do_generate(**kwargs):
         theme_safe = "".join(c for c in kwargs['theme_name'] if c.isalnum() or c in "_-")
         out_name = f"{safe_name}_{theme_safe}"
 
-        common = '''
+        # ═══ JavaScript المُحسّن للتحميل ═══
+        common_js = '''
         function svgToCanvas(b64, width, height, bgColor) {
             return new Promise(function(resolve, reject) {
                 try {
-                    var svgString = atob(b64);
+                    // فك Base64 مع دعم UTF-8 للأحرف العربية
+                    var svgString = decodeURIComponent(escape(atob(b64)));
+
                     var canvas = document.createElement('canvas');
                     var scale = 2;
                     canvas.width = width * scale;
                     canvas.height = height * scale;
                     var ctx = canvas.getContext('2d');
+
                     if (bgColor) {
                         ctx.fillStyle = bgColor;
                         ctx.fillRect(0, 0, canvas.width, canvas.height);
                     }
+
                     var img = new Image();
-                    var blob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-                    var url = URL.createObjectURL(blob);
+
+                    // استخدام Data URI مع UTF-8 (يعمل على كل المتصفحات)
+                    var svgDataUri = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgString);
+
                     img.onload = function() {
                         ctx.scale(scale, scale);
                         ctx.drawImage(img, 0, 0, width, height);
-                        URL.revokeObjectURL(url);
                         resolve(canvas);
                     };
+
                     img.onerror = function() {
-                        URL.revokeObjectURL(url);
-                        reject('فشل تحميل الصورة');
+                        // محاولة ثانية بطريقة مختلفة
+                        var blob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+                        var url = URL.createObjectURL(blob);
+                        var img2 = new Image();
+                        img2.onload = function() {
+                            ctx.scale(scale, scale);
+                            ctx.drawImage(img2, 0, 0, width, height);
+                            URL.revokeObjectURL(url);
+                            resolve(canvas);
+                        };
+                        img2.onerror = function() {
+                            URL.revokeObjectURL(url);
+                            reject('فشل تحميل الصورة');
+                        };
+                        img2.src = url;
                     };
-                    img.src = url;
+
+                    img.src = svgDataUri;
                 } catch(e) {
-                    reject(e.message);
+                    reject(e.message || 'خطأ في المعالجة');
                 }
             });
         }
-        function dlFile(canvas, fmt, q, name) {
-            canvas.toBlob(function(blob) {
-                var url = URL.createObjectURL(blob);
+
+        function downloadCanvas(canvas, mimeType, quality, filename) {
+            try {
+                var dataUrl = canvas.toDataURL(mimeType, quality);
                 var a = document.createElement('a');
-                a.href = url;
-                a.download = name;
+                a.href = dataUrl;
+                a.download = filename;
+                a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
-                document.body.removeChild(a);
-                setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
-            }, 'image/' + fmt, q);
+                setTimeout(function() {
+                    document.body.removeChild(a);
+                }, 100);
+            } catch(e) {
+                alert('فشل التحميل: ' + e.message);
+            }
         }
         '''
 
-        png_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('ولّد أولاً');return;}}{common}svgToCanvas(b64,window.__cc_w,window.__cc_h,null).then(function(c){{dlFile(c,'png',1.0,'{out_name}.png');}}).catch(function(e){{alert('خطأ: '+e);}});}})();'''
+        png_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('الرجاء توليد الصورة أولاً');return;}}{common_js}svgToCanvas(b64,window.__cc_w,window.__cc_h,null).then(function(c){{downloadCanvas(c,'image/png',1.0,'{out_name}.png');}}).catch(function(e){{alert('خطأ: '+e);}});}})();'''
 
-        jpg_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('ولّد أولاً');return;}}{common}svgToCanvas(b64,window.__cc_w,window.__cc_h,'#ffffff').then(function(c){{dlFile(c,'jpeg',0.95,'{out_name}.jpg');}}).catch(function(e){{alert('خطأ: '+e);}});}})();'''
+        jpg_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('الرجاء توليد الصورة أولاً');return;}}{common_js}svgToCanvas(b64,window.__cc_w,window.__cc_h,'#ffffff').then(function(c){{downloadCanvas(c,'image/jpeg',0.95,'{out_name}.jpg');}}).catch(function(e){{alert('خطأ: '+e);}});}})();'''
 
-        webp_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('ولّد أولاً');return;}}{common}svgToCanvas(b64,window.__cc_w,window.__cc_h,null).then(function(c){{dlFile(c,'webp',0.95,'{out_name}.webp');}}).catch(function(e){{alert('خطأ: '+e);}});}})();'''
+        webp_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('الرجاء توليد الصورة أولاً');return;}}{common_js}svgToCanvas(b64,window.__cc_w,window.__cc_h,null).then(function(c){{downloadCanvas(c,'image/webp',0.95,'{out_name}.webp');}}).catch(function(e){{alert('خطأ: '+e);}});}})();'''
 
-        svg_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('ولّد أولاً');return;}}var s=atob(b64);var blob=new Blob([s],{{type:'image/svg+xml;charset=utf-8'}});var u=URL.createObjectURL(blob);var a=document.createElement('a');a.href=u;a.download='{out_name}.svg';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){{URL.revokeObjectURL(u);}},1000);}})();'''
+        svg_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('الرجاء توليد الصورة أولاً');return;}}try{{var s=decodeURIComponent(escape(atob(b64)));var blob=new Blob([s],{{type:'image/svg+xml;charset=utf-8'}});var u=URL.createObjectURL(blob);var a=document.createElement('a');a.href=u;a.download='{out_name}.svg';a.style.display='none';document.body.appendChild(a);a.click();setTimeout(function(){{document.body.removeChild(a);URL.revokeObjectURL(u);}},100);}}catch(e){{alert('خطأ: '+e.message);}}}})();'''
 
         put_buttons(
             ['تحميل PNG', 'تحميل JPG', 'تحميل WebP', 'تحميل SVG', 'طباعة'],
