@@ -994,7 +994,7 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 8080))
     print(f"\n{'='*60}")
-    print(f"  CodeCanvas Pro v{SITE_VERSION}")
+    print(f"  CodeCanvas Pro")
     print(f"  Port: {port}")
     print(f"{'='*60}\n")
     start_server(main, port=port, host='0.0.0.0', debug=False)
