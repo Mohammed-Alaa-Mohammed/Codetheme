@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-CodeCanvas Pro v6.0 - محرر صور الأكواد الاحترافي
+CodeCanvas Pro v6.1 - محرر صور الأكواد الاحترافي
 Developed by Muhammed Alaa © 2026
 """
 from pywebio import start_server
@@ -10,7 +10,7 @@ from pywebio.output import (
     put_info, put_warning, put_error,
     clear, toast, use_scope, put_collapse
 )
-from pywebio.session import set_env, run_js, go_app, local
+from pywebio.session import set_env, run_js
 import base64
 import html as html_module
 import random
@@ -22,31 +22,14 @@ from datetime import datetime
 
 SITE_NAME = "CodeCanvas Pro — محرر صور الأكواد"
 SITE_DESC = "حوّل أكوادك إلى صور احترافية بـ 25 ثيماً و 15 لغة"
-SITE_VERSION = "6.0"
+SITE_VERSION = "6.1"
 AUTHOR = "Muhammed Alaa"
 COPYRIGHT = f"{AUTHOR} © 2026"
 
-SITE_ICON_SVG = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-<defs>
-<linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
-<stop offset="0%" stop-color="#667eea"/>
-<stop offset="100%" stop-color="#764ba2"/>
-</linearGradient>
-</defs>
-<rect x="4" y="4" width="56" height="56" rx="14" fill="url(#lg1)"/>
-<rect x="11" y="15" width="42" height="34" rx="4" fill="#ffffff" opacity="0.12"/>
-<rect x="11" y="15" width="42" height="9" rx="4" fill="#ffffff" opacity="0.22"/>
-<circle cx="15" cy="19.5" r="1.6" fill="#ff5f56"/>
-<circle cx="20" cy="19.5" r="1.6" fill="#ffbd2e"/>
-<circle cx="25" cy="19.5" r="1.6" fill="#27c93f"/>
-<path d="M 18 29 L 22 33 L 18 37" stroke="#00ff9f" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-<line x1="27" y1="37" x2="36" y2="37" stroke="#00ff9f" stroke-width="2.5" stroke-linecap="round"/>
-<circle cx="44" cy="32" r="3.5" fill="#f92672"/>
-<circle cx="48" cy="27" r="2.5" fill="#e6db74"/>
-<circle cx="47" cy="39" r="2.5" fill="#66d9ef"/>
-</svg>'''
+SITE_ICON_SVG = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect x="4" y="4" width="56" height="56" rx="14" fill="url(#lg1)"/><rect x="11" y="15" width="42" height="34" rx="4" fill="#ffffff" opacity="0.12"/><rect x="11" y="15" width="42" height="9" rx="4" fill="#ffffff" opacity="0.22"/><circle cx="15" cy="19.5" r="1.6" fill="#ff5f56"/><circle cx="20" cy="19.5" r="1.6" fill="#ffbd2e"/><circle cx="25" cy="19.5" r="1.6" fill="#27c93f"/><path d="M 18 29 L 22 33 L 18 37" stroke="#00ff9f" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="27" y1="37" x2="36" y2="37" stroke="#00ff9f" stroke-width="2.5" stroke-linecap="round"/><circle cx="44" cy="32" r="3.5" fill="#f92672"/><circle cx="48" cy="27" r="2.5" fill="#e6db74"/><circle cx="47" cy="39" r="2.5" fill="#66d9ef"/></svg>'''
 
-SITE_ICON_URI = "data:image/svg+xml;base64," + base64.b64encode(SITE_ICON_SVG.encode('utf-8')).decode('ascii')
+SITE_ICON_B64 = base64.b64encode(SITE_ICON_SVG.encode('utf-8')).decode('ascii')
+SITE_ICON_URI = f"data:image/svg+xml;base64,{SITE_ICON_B64}"
 
 
 # ═══════════════════════════════════════════════════════════
@@ -71,34 +54,16 @@ ICONS = {
     "glow": '<circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none" opacity="0.25"/>',
     "border": '<rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="4,3"/>',
     "pencil": '<path d="M 3 21 L 4 16 L 16 4 L 20 8 L 8 20 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><line x1="14" y1="6" x2="18" y2="10" stroke="currentColor" stroke-width="2"/>',
-    "play": '<polygon points="6,4 20,12 6,20" fill="currentColor"/>',
     "refresh": '<path d="M 20 12 A 8 8 0 1 1 12 4 M 12 4 L 16 8 M 12 4 L 16 0" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
     "random": '<path d="M 16 4 L 21 8 L 16 12 M 21 8 L 3 8 M 8 12 L 3 16 L 8 20 M 3 16 L 21 16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
-    "file": '<path d="M 6 2 L 6 22 L 18 22 L 18 8 L 14 2 Z M 14 2 L 14 8 L 18 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
     "printer": '<path d="M 6 9 L 6 3 L 18 3 L 18 9 M 6 18 L 3 18 L 3 9 L 21 9 L 21 18 L 18 18 M 6 14 L 18 14 L 18 22 L 6 22 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
-    "copy": '<rect x="9" y="9" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M 5 15 L 3 15 L 3 3 L 15 3 L 15 5" stroke="currentColor" stroke-width="2" fill="none"/>',
-    "info": '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="11" x2="12" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/>',
-    "check": '<polyline points="4,12 10,18 20,6" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
-    "close": '<line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>',
-    "eye": '<path d="M 2 12 C 5 6 9 4 12 4 C 15 4 19 6 22 12 C 19 18 15 20 12 20 C 9 20 5 18 2 12 Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3" fill="currentColor"/>',
-    "layers": '<polygon points="12,2 22,8 12,14 2,8" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><polyline points="2,16 12,22 22,16" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><polyline points="2,12 12,18 22,12" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
-    "rocket": '<path d="M 12 2 C 8 6 6 12 6 16 L 3 20 L 7 17 C 11 17 17 15 21 11 L 12 2 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><circle cx="14" cy="10" r="1.5" fill="currentColor"/><path d="M 6 16 L 3 15 L 5 13 M 8 18 L 9 21 L 11 19" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
     "heart": '<path d="M 12 21 C 12 21 3 14 3 8.5 C 3 5.5 5.5 3 8.5 3 C 10.5 3 12 4.5 12 4.5 C 12 4.5 13.5 3 15.5 3 C 18.5 3 21 5.5 21 8.5 C 21 14 12 21 12 21 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
-    "warning": '<path d="M 12 2 L 22 20 L 2 20 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/>',
-    "window": '<rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="7" r="0.8" fill="currentColor"/><circle cx="9" cy="7" r="0.8" fill="currentColor"/><circle cx="12" cy="7" r="0.8" fill="currentColor"/>',
 }
 
 
 def icon(name, size=20, color="currentColor"):
-    """إرجاع أيقونة SVG"""
-    path = ICONS.get(name, ICONS["code"])
-    path = path.replace("currentColor", color)
+    path = ICONS.get(name, ICONS["code"]).replace("currentColor", color)
     return f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 24 24" style="vertical-align:middle;display:inline-block;flex-shrink:0;">{path}</svg>'
-
-
-def icon_text(name, text, size=18, color="#667eea", gap=8):
-    """أيقونة + نص"""
-    return f'<span style="display:inline-flex;align-items:center;gap:{gap}px;vertical-align:middle;">{icon(name, size, color)}<span>{text}</span></span>'
 
 
 # ═══════════════════════════════════════════════════════════
@@ -106,112 +71,33 @@ def icon_text(name, text, size=18, color="#667eea", gap=8):
 # ═══════════════════════════════════════════════════════════
 
 THEMES = {
-    "Monokai": {"bg": "#272822", "text": "#f8f8f2", "comment": "#75715e",
-        "keyword": "#f92672", "string": "#e6db74", "number": "#ae81ff",
-        "function": "#a6e22e", "class": "#66d9ef", "accent": "#fd971f",
-        "window_bg": "#3e3d32"},
-    "Dracula": {"bg": "#282a36", "text": "#f8f8f2", "comment": "#6272a4",
-        "keyword": "#ff79c6", "string": "#f1fa8c", "number": "#bd93f9",
-        "function": "#50fa7b", "class": "#8be9fd", "accent": "#bd93f9",
-        "window_bg": "#44475a"},
-    "One Dark Pro": {"bg": "#282c34", "text": "#abb2bf", "comment": "#5c6370",
-        "keyword": "#c678dd", "string": "#98c379", "number": "#d19a66",
-        "function": "#61afef", "class": "#e5c07b", "accent": "#61afef",
-        "window_bg": "#21252b"},
-    "GitHub Dark": {"bg": "#0d1117", "text": "#c9d1d9", "comment": "#8b949e",
-        "keyword": "#ff7b72", "string": "#a5d6ff", "number": "#79c0ff",
-        "function": "#d2a8ff", "class": "#ffa657", "accent": "#58a6ff",
-        "window_bg": "#161b22"},
-    "GitHub Light": {"bg": "#ffffff", "text": "#24292f", "comment": "#6e7781",
-        "keyword": "#cf222e", "string": "#0a3069", "number": "#0550ae",
-        "function": "#8250df", "class": "#953800", "accent": "#0969da",
-        "window_bg": "#f6f8fa"},
-    "VS Code Dark+": {"bg": "#1e1e1e", "text": "#d4d4d4", "comment": "#6a9955",
-        "keyword": "#569cd6", "string": "#ce9178", "number": "#b5cea8",
-        "function": "#dcdcaa", "class": "#4ec9b0", "accent": "#007acc",
-        "window_bg": "#252526"},
-    "Solarized Dark": {"bg": "#002b36", "text": "#839496", "comment": "#586e75",
-        "keyword": "#859900", "string": "#2aa198", "number": "#d33682",
-        "function": "#268bd2", "class": "#b58900", "accent": "#268bd2",
-        "window_bg": "#073642"},
-    "Solarized Light": {"bg": "#fdf6e3", "text": "#657b83", "comment": "#93a1a1",
-        "keyword": "#859900", "string": "#2aa198", "number": "#d33682",
-        "function": "#268bd2", "class": "#b58900", "accent": "#268bd2",
-        "window_bg": "#eee8d5"},
-    "Nord": {"bg": "#2e3440", "text": "#d8dee9", "comment": "#616e88",
-        "keyword": "#81a1c1", "string": "#a3be8c", "number": "#b48ead",
-        "function": "#88c0d0", "class": "#8fbcbb", "accent": "#88c0d0",
-        "window_bg": "#3b4252"},
-    "Gruvbox Dark": {"bg": "#282828", "text": "#ebdbb2", "comment": "#928374",
-        "keyword": "#fb4934", "string": "#b8bb26", "number": "#d3869b",
-        "function": "#b8bb26", "class": "#fabd2f", "accent": "#fabd2f",
-        "window_bg": "#3c3836"},
-    "Gruvbox Light": {"bg": "#fbf1c7", "text": "#3c3836", "comment": "#928374",
-        "keyword": "#9d0006", "string": "#79740e", "number": "#8f3f71",
-        "function": "#79740e", "class": "#b57614", "accent": "#b57614",
-        "window_bg": "#ebdbb2"},
-    "Tokyo Night": {"bg": "#1a1b26", "text": "#c0caf5", "comment": "#565f89",
-        "keyword": "#bb9af7", "string": "#9ece6a", "number": "#ff9e64",
-        "function": "#7aa2f7", "class": "#2ac3de", "accent": "#bb9af7",
-        "window_bg": "#24283b"},
-    "Catppuccin Mocha": {"bg": "#1e1e2e", "text": "#cdd6f4", "comment": "#6c7086",
-        "keyword": "#cba6f7", "string": "#a6e3a1", "number": "#fab387",
-        "function": "#89b4fa", "class": "#f9e2af", "accent": "#cba6f7",
-        "window_bg": "#313244"},
-    "Catppuccin Latte": {"bg": "#eff1f5", "text": "#4c4f69", "comment": "#9ca0b0",
-        "keyword": "#8839ef", "string": "#40a02b", "number": "#fe640b",
-        "function": "#1e66f5", "class": "#df8e1d", "accent": "#8839ef",
-        "window_bg": "#e6e9ef"},
-    "Material Ocean": {"bg": "#0f111a", "text": "#8f93a2", "comment": "#464b5d",
-        "keyword": "#c792ea", "string": "#c3e88d", "number": "#f78c6c",
-        "function": "#82aaff", "class": "#ffcb6b", "accent": "#82aaff",
-        "window_bg": "#1a1f2e"},
-    "Palenight": {"bg": "#292d3e", "text": "#a6accd", "comment": "#676e95",
-        "keyword": "#c792ea", "string": "#c3e88d", "number": "#f78c6c",
-        "function": "#82aaff", "class": "#ffcb6b", "accent": "#c792ea",
-        "window_bg": "#1b1e2b"},
-    "Synthwave 84": {"bg": "#262335", "text": "#ffffff", "comment": "#848bbd",
-        "keyword": "#f92aad", "string": "#ff8b39", "number": "#f97e72",
-        "function": "#36f9f6", "class": "#fede5d", "accent": "#f92aad",
-        "window_bg": "#1e1c2f"},
-    "Cyberpunk": {"bg": "#0d0221", "text": "#00ff9f", "comment": "#6c7086",
-        "keyword": "#ff00ff", "string": "#ffff00", "number": "#00d9ff",
-        "function": "#00ff9f", "class": "#ff00ff", "accent": "#ff00ff",
-        "window_bg": "#1a0b2e"},
-    "Ayu Mirage": {"bg": "#1f2430", "text": "#cbccc6", "comment": "#5c6773",
-        "keyword": "#ffa759", "string": "#bae67e", "number": "#d4bfff",
-        "function": "#ffd580", "class": "#73d0ff", "accent": "#ffa759",
-        "window_bg": "#242936"},
-    "Horizon": {"bg": "#1c1e26", "text": "#d5d8da", "comment": "#6c6f93",
-        "keyword": "#e95678", "string": "#fadad1", "number": "#f09483",
-        "function": "#fab795", "class": "#b877db", "accent": "#e95678",
-        "window_bg": "#232530"},
-    "Rosé Pine": {"bg": "#191724", "text": "#e0def4", "comment": "#6e6a86",
-        "keyword": "#c4a7e7", "string": "#f6c177", "number": "#ebbcba",
-        "function": "#9ccfd8", "class": "#31748f", "accent": "#ebbcba",
-        "window_bg": "#1f1d2e"},
-    "Night Owl": {"bg": "#011627", "text": "#d6deeb", "comment": "#637777",
-        "keyword": "#c792ea", "string": "#ecc48d", "number": "#f78c6c",
-        "function": "#82aaff", "class": "#ffcb8b", "accent": "#82aaff",
-        "window_bg": "#0b2942"},
-    "Bluloco Dark": {"bg": "#282c34", "text": "#abb2bf", "comment": "#5c6370",
-        "keyword": "#c678dd", "string": "#98c379", "number": "#d19a66",
-        "function": "#61afef", "class": "#e5c07b", "accent": "#61afef",
-        "window_bg": "#21252b"},
-    "Aurora X": {"bg": "#1a1a2e", "text": "#eaeaea", "comment": "#8d8daa",
-        "keyword": "#e94560", "string": "#f6c177", "number": "#a8dadc",
-        "function": "#4cc9f0", "class": "#f72585", "accent": "#e94560",
-        "window_bg": "#16213e"},
-    "Sunset": {"bg": "#2b1055", "text": "#f8f8f2", "comment": "#a09ebb",
-        "keyword": "#ff79c6", "string": "#f1fa8c", "number": "#bd93f9",
-        "function": "#50fa7b", "class": "#8be9fd", "accent": "#ff79c6",
-        "window_bg": "#3a1a6b"},
+    "Monokai": {"bg": "#272822", "text": "#f8f8f2", "comment": "#75715e", "keyword": "#f92672", "string": "#e6db74", "number": "#ae81ff", "function": "#a6e22e", "class": "#66d9ef", "accent": "#fd971f", "window_bg": "#3e3d32"},
+    "Dracula": {"bg": "#282a36", "text": "#f8f8f2", "comment": "#6272a4", "keyword": "#ff79c6", "string": "#f1fa8c", "number": "#bd93f9", "function": "#50fa7b", "class": "#8be9fd", "accent": "#bd93f9", "window_bg": "#44475a"},
+    "One Dark Pro": {"bg": "#282c34", "text": "#abb2bf", "comment": "#5c6370", "keyword": "#c678dd", "string": "#98c379", "number": "#d19a66", "function": "#61afef", "class": "#e5c07b", "accent": "#61afef", "window_bg": "#21252b"},
+    "GitHub Dark": {"bg": "#0d1117", "text": "#c9d1d9", "comment": "#8b949e", "keyword": "#ff7b72", "string": "#a5d6ff", "number": "#79c0ff", "function": "#d2a8ff", "class": "#ffa657", "accent": "#58a6ff", "window_bg": "#161b22"},
+    "GitHub Light": {"bg": "#ffffff", "text": "#24292f", "comment": "#6e7781", "keyword": "#cf222e", "string": "#0a3069", "number": "#0550ae", "function": "#8250df", "class": "#953800", "accent": "#0969da", "window_bg": "#f6f8fa"},
+    "VS Code Dark+": {"bg": "#1e1e1e", "text": "#d4d4d4", "comment": "#6a9955", "keyword": "#569cd6", "string": "#ce9178", "number": "#b5cea8", "function": "#dcdcaa", "class": "#4ec9b0", "accent": "#007acc", "window_bg": "#252526"},
+    "Solarized Dark": {"bg": "#002b36", "text": "#839496", "comment": "#586e75", "keyword": "#859900", "string": "#2aa198", "number": "#d33682", "function": "#268bd2", "class": "#b58900", "accent": "#268bd2", "window_bg": "#073642"},
+    "Solarized Light": {"bg": "#fdf6e3", "text": "#657b83", "comment": "#93a1a1", "keyword": "#859900", "string": "#2aa198", "number": "#d33682", "function": "#268bd2", "class": "#b58900", "accent": "#268bd2", "window_bg": "#eee8d5"},
+    "Nord": {"bg": "#2e3440", "text": "#d8dee9", "comment": "#616e88", "keyword": "#81a1c1", "string": "#a3be8c", "number": "#b48ead", "function": "#88c0d0", "class": "#8fbcbb", "accent": "#88c0d0", "window_bg": "#3b4252"},
+    "Gruvbox Dark": {"bg": "#282828", "text": "#ebdbb2", "comment": "#928374", "keyword": "#fb4934", "string": "#b8bb26", "number": "#d3869b", "function": "#b8bb26", "class": "#fabd2f", "accent": "#fabd2f", "window_bg": "#3c3836"},
+    "Gruvbox Light": {"bg": "#fbf1c7", "text": "#3c3836", "comment": "#928374", "keyword": "#9d0006", "string": "#79740e", "number": "#8f3f71", "function": "#79740e", "class": "#b57614", "accent": "#b57614", "window_bg": "#ebdbb2"},
+    "Tokyo Night": {"bg": "#1a1b26", "text": "#c0caf5", "comment": "#565f89", "keyword": "#bb9af7", "string": "#9ece6a", "number": "#ff9e64", "function": "#7aa2f7", "class": "#2ac3de", "accent": "#bb9af7", "window_bg": "#24283b"},
+    "Catppuccin Mocha": {"bg": "#1e1e2e", "text": "#cdd6f4", "comment": "#6c7086", "keyword": "#cba6f7", "string": "#a6e3a1", "number": "#fab387", "function": "#89b4fa", "class": "#f9e2af", "accent": "#cba6f7", "window_bg": "#313244"},
+    "Catppuccin Latte": {"bg": "#eff1f5", "text": "#4c4f69", "comment": "#9ca0b0", "keyword": "#8839ef", "string": "#40a02b", "number": "#fe640b", "function": "#1e66f5", "class": "#df8e1d", "accent": "#8839ef", "window_bg": "#e6e9ef"},
+    "Material Ocean": {"bg": "#0f111a", "text": "#8f93a2", "comment": "#464b5d", "keyword": "#c792ea", "string": "#c3e88d", "number": "#f78c6c", "function": "#82aaff", "class": "#ffcb6b", "accent": "#82aaff", "window_bg": "#1a1f2e"},
+    "Palenight": {"bg": "#292d3e", "text": "#a6accd", "comment": "#676e95", "keyword": "#c792ea", "string": "#c3e88d", "number": "#f78c6c", "function": "#82aaff", "class": "#ffcb6b", "accent": "#c792ea", "window_bg": "#1b1e2b"},
+    "Synthwave 84": {"bg": "#262335", "text": "#ffffff", "comment": "#848bbd", "keyword": "#f92aad", "string": "#ff8b39", "number": "#f97e72", "function": "#36f9f6", "class": "#fede5d", "accent": "#f92aad", "window_bg": "#1e1c2f"},
+    "Cyberpunk": {"bg": "#0d0221", "text": "#00ff9f", "comment": "#6c7086", "keyword": "#ff00ff", "string": "#ffff00", "number": "#00d9ff", "function": "#00ff9f", "class": "#ff00ff", "accent": "#ff00ff", "window_bg": "#1a0b2e"},
+    "Ayu Mirage": {"bg": "#1f2430", "text": "#cbccc6", "comment": "#5c6773", "keyword": "#ffa759", "string": "#bae67e", "number": "#d4bfff", "function": "#ffd580", "class": "#73d0ff", "accent": "#ffa759", "window_bg": "#242936"},
+    "Horizon": {"bg": "#1c1e26", "text": "#d5d8da", "comment": "#6c6f93", "keyword": "#e95678", "string": "#fadad1", "number": "#f09483", "function": "#fab795", "class": "#b877db", "accent": "#e95678", "window_bg": "#232530"},
+    "Rosé Pine": {"bg": "#191724", "text": "#e0def4", "comment": "#6e6a86", "keyword": "#c4a7e7", "string": "#f6c177", "number": "#ebbcba", "function": "#9ccfd8", "class": "#31748f", "accent": "#ebbcba", "window_bg": "#1f1d2e"},
+    "Night Owl": {"bg": "#011627", "text": "#d6deeb", "comment": "#637777", "keyword": "#c792ea", "string": "#ecc48d", "number": "#f78c6c", "function": "#82aaff", "class": "#ffcb8b", "accent": "#82aaff", "window_bg": "#0b2942"},
+    "Bluloco Dark": {"bg": "#282c34", "text": "#abb2bf", "comment": "#5c6370", "keyword": "#c678dd", "string": "#98c379", "number": "#d19a66", "function": "#61afef", "class": "#e5c07b", "accent": "#61afef", "window_bg": "#21252b"},
+    "Aurora X": {"bg": "#1a1a2e", "text": "#eaeaea", "comment": "#8d8daa", "keyword": "#e94560", "string": "#f6c177", "number": "#a8dadc", "function": "#4cc9f0", "class": "#f72585", "accent": "#e94560", "window_bg": "#16213e"},
+    "Sunset": {"bg": "#2b1055", "text": "#f8f8f2", "comment": "#a09ebb", "keyword": "#ff79c6", "string": "#f1fa8c", "number": "#bd93f9", "function": "#50fa7b", "class": "#8be9fd", "accent": "#ff79c6", "window_bg": "#3a1a6b"},
 }
 
-
-# ═══════════════════════════════════════════════════════════
-#                    🌈 الخلفيات
-# ═══════════════════════════════════════════════════════════
 
 BACKGROUNDS = {
     "بدون (لون الثيم)": {"type": "theme"},
@@ -240,10 +126,6 @@ BACKGROUNDS = {
 }
 
 
-# ═══════════════════════════════════════════════════════════
-#                    📐 القوالب
-# ═══════════════════════════════════════════════════════════
-
 TEMPLATES = {
     "افتراضي": {"padding": 25, "font": 14, "radius": 12, "show_window": True},
     "بدون نافذة": {"padding": 20, "font": 14, "radius": 0, "show_window": False},
@@ -258,46 +140,21 @@ TEMPLATES = {
 }
 
 
-# ═══════════════════════════════════════════════════════════
-#                    💻 اللغات
-# ═══════════════════════════════════════════════════════════
-
 LANGUAGES = {
-    "Python": {"keywords": {'False','None','True','and','as','assert','async','await','break','class','continue','def','del','elif','else','except','finally','for','from','global','if','import','in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield','self'},
-        "builtins": {'print','len','range','str','int','float','list','dict','set','tuple','bool','input','type','sum','max','min','sorted','enumerate','zip','map','filter','abs','round','all','any','open','isinstance'},
-        "comment": "#", "strings": ['"', "'"], "filename": "main.py"},
-    "JavaScript": {"keywords": {'var','let','const','function','return','if','else','for','while','do','switch','case','break','continue','new','this','class','extends','super','try','catch','finally','throw','typeof','instanceof','in','of','null','undefined','true','false','async','await','yield','import','export','from','default'},
-        "builtins": {'console','Math','JSON','Object','Array','String','Number','Boolean','Date','Promise','Map','Set'},
-        "comment": "//", "strings": ['"', "'", '`'], "filename": "main.js"},
-    "TypeScript": {"keywords": {'let','const','var','function','return','if','else','for','while','do','switch','case','break','continue','new','this','class','extends','super','interface','type','enum','implements','public','private','protected','readonly','abstract','as','is','null','undefined','true','false','async','await','import','export','from','default'},
-        "builtins": {'console','Math','JSON','Object','Array','String','Number','Boolean','Date','Promise','Map','Set'},
-        "comment": "//", "strings": ['"', "'", '`'], "filename": "main.ts"},
+    "Python": {"keywords": {'False','None','True','and','as','assert','async','await','break','class','continue','def','del','elif','else','except','finally','for','from','global','if','import','in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield','self'}, "builtins": {'print','len','range','str','int','float','list','dict','set','tuple','bool','input','type','sum','max','min','sorted','enumerate','zip','map','filter','abs','round','all','any','open','isinstance'}, "comment": "#", "strings": ['"', "'"], "filename": "main.py"},
+    "JavaScript": {"keywords": {'var','let','const','function','return','if','else','for','while','do','switch','case','break','continue','new','this','class','extends','super','try','catch','finally','throw','typeof','instanceof','in','of','null','undefined','true','false','async','await','yield','import','export','from','default'}, "builtins": {'console','Math','JSON','Object','Array','String','Number','Boolean','Date','Promise','Map','Set'}, "comment": "//", "strings": ['"', "'", '`'], "filename": "main.js"},
+    "TypeScript": {"keywords": {'let','const','var','function','return','if','else','for','while','do','switch','case','break','continue','new','this','class','extends','super','interface','type','enum','implements','public','private','protected','readonly','abstract','as','is','null','undefined','true','false','async','await','import','export','from','default'}, "builtins": {'console','Math','JSON','Object','Array','String','Number','Boolean','Date','Promise','Map','Set'}, "comment": "//", "strings": ['"', "'", '`'], "filename": "main.ts"},
     "HTML": {"keywords": set(), "builtins": set(), "comment": "<!--", "strings": ['"', "'"], "filename": "index.html"},
     "CSS": {"keywords": {'important','media','import','keyframes','font-face'}, "builtins": set(), "comment": "/*", "strings": ['"', "'"], "filename": "style.css"},
     "JSON": {"keywords": {'true','false','null'}, "builtins": set(), "comment": "//", "strings": ['"'], "filename": "data.json"},
-    "SQL": {"keywords": {'SELECT','FROM','WHERE','INSERT','INTO','VALUES','UPDATE','SET','DELETE','CREATE','TABLE','DROP','ALTER','JOIN','LEFT','RIGHT','INNER','ON','GROUP','BY','ORDER','HAVING','LIMIT','AS','AND','OR','NOT','NULL','IS','IN','BETWEEN','LIKE','DISTINCT'},
-        "builtins": set(), "comment": "--", "strings": ["'"], "filename": "query.sql"},
-    "Bash": {"keywords": {'if','then','else','elif','fi','for','while','do','done','case','esac','function','return','break','continue','in','echo','export','source','read','local','exit','cd','pwd','ls'},
-        "builtins": {'echo','printf','read','cd','ls','pwd','mkdir','rm','cat','grep','sed','awk','find','chmod'},
-        "comment": "#", "strings": ['"', "'"], "filename": "script.sh"},
-    "Java": {"keywords": {'public','private','protected','class','interface','extends','implements','static','final','abstract','return','if','else','for','while','do','switch','case','break','continue','new','this','super','try','catch','finally','throw','throws','import','package','void','int','long','double','float','boolean','char','String','null','true','false','enum'},
-        "builtins": {'System','String','Integer','Double','Math','Object'},
-        "comment": "//", "strings": ['"', "'"], "filename": "Main.java"},
-    "C++": {"keywords": {'int','char','double','float','bool','void','long','short','unsigned','signed','const','static','extern','inline','virtual','class','struct','union','enum','namespace','using','public','private','protected','return','if','else','for','while','do','switch','case','break','continue','new','delete','this','try','catch','throw','template','auto','nullptr','true','false'},
-        "builtins": {'cout','cin','endl','std','string','vector','map','set'},
-        "comment": "//", "strings": ['"', "'"], "filename": "main.cpp"},
-    "PHP": {"keywords": {'function','class','interface','extends','implements','public','private','protected','static','const','var','return','if','else','elseif','for','foreach','while','do','switch','case','break','continue','new','this','try','catch','finally','throw','use','namespace','echo','print','true','false','null'},
-        "builtins": {'echo','print','array','count','strlen','substr'},
-        "comment": "//", "strings": ['"', "'"], "filename": "index.php"},
-    "Go": {"keywords": {'package','import','func','var','const','type','struct','interface','map','chan','go','defer','return','if','else','for','switch','case','break','continue','range','true','false','nil'},
-        "builtins": {'println','printf','make','new','len','cap','append'},
-        "comment": "//", "strings": ['"', '`'], "filename": "main.go"},
-    "Rust": {"keywords": {'fn','let','mut','const','static','struct','enum','trait','impl','pub','use','mod','crate','self','super','return','if','else','match','for','while','loop','break','continue','in','as'},
-        "builtins": {'println','print','vec','String','Box','Option','Result'},
-        "comment": "//", "strings": ['"'], "filename": "main.rs"},
-    "Ruby": {"keywords": {'def','end','class','module','if','elsif','else','unless','while','until','for','do','case','when','then','begin','rescue','ensure','return','yield','break','next','self','nil','true','false'},
-        "builtins": {'puts','print','p','gets','require'},
-        "comment": "#", "strings": ['"', "'"], "filename": "main.rb"},
+    "SQL": {"keywords": {'SELECT','FROM','WHERE','INSERT','INTO','VALUES','UPDATE','SET','DELETE','CREATE','TABLE','DROP','ALTER','JOIN','LEFT','RIGHT','INNER','ON','GROUP','BY','ORDER','HAVING','LIMIT','AS','AND','OR','NOT','NULL','IS','IN','BETWEEN','LIKE','DISTINCT'}, "builtins": set(), "comment": "--", "strings": ["'"], "filename": "query.sql"},
+    "Bash": {"keywords": {'if','then','else','elif','fi','for','while','do','done','case','esac','function','return','break','continue','in','echo','export','source','read','local','exit','cd','pwd','ls'}, "builtins": {'echo','printf','read','cd','ls','pwd','mkdir','rm','cat','grep','sed','awk','find','chmod'}, "comment": "#", "strings": ['"', "'"], "filename": "script.sh"},
+    "Java": {"keywords": {'public','private','protected','class','interface','extends','implements','static','final','abstract','return','if','else','for','while','do','switch','case','break','continue','new','this','super','try','catch','finally','throw','throws','import','package','void','int','long','double','float','boolean','char','String','null','true','false','enum'}, "builtins": {'System','String','Integer','Double','Math','Object'}, "comment": "//", "strings": ['"', "'"], "filename": "Main.java"},
+    "C++": {"keywords": {'int','char','double','float','bool','void','long','short','unsigned','signed','const','static','extern','inline','virtual','class','struct','union','enum','namespace','using','public','private','protected','return','if','else','for','while','do','switch','case','break','continue','new','delete','this','try','catch','throw','template','auto','nullptr','true','false'}, "builtins": {'cout','cin','endl','std','string','vector','map','set'}, "comment": "//", "strings": ['"', "'"], "filename": "main.cpp"},
+    "PHP": {"keywords": {'function','class','interface','extends','implements','public','private','protected','static','const','var','return','if','else','elseif','for','foreach','while','do','switch','case','break','continue','new','this','try','catch','finally','throw','use','namespace','echo','print','true','false','null'}, "builtins": {'echo','print','array','count','strlen','substr'}, "comment": "//", "strings": ['"', "'"], "filename": "index.php"},
+    "Go": {"keywords": {'package','import','func','var','const','type','struct','interface','map','chan','go','defer','return','if','else','for','switch','case','break','continue','range','true','false','nil'}, "builtins": {'println','printf','make','new','len','cap','append'}, "comment": "//", "strings": ['"', '`'], "filename": "main.go"},
+    "Rust": {"keywords": {'fn','let','mut','const','static','struct','enum','trait','impl','pub','use','mod','crate','self','super','return','if','else','match','for','while','loop','break','continue','in','as'}, "builtins": {'println','print','vec','String','Box','Option','Result'}, "comment": "//", "strings": ['"'], "filename": "main.rs"},
+    "Ruby": {"keywords": {'def','end','class','module','if','elsif','else','unless','while','until','for','do','case','when','then','begin','rescue','ensure','return','yield','break','next','self','nil','true','false'}, "builtins": {'puts','print','p','gets','require'}, "comment": "#", "strings": ['"', "'"], "filename": "main.rb"},
     "YAML": {"keywords": {'true','false','null','yes','no'}, "builtins": set(), "comment": "#", "strings": ['"', "'"], "filename": "config.yaml"},
 }
 
@@ -317,15 +174,11 @@ def find_comment(line, cc, quotes):
         ch = line[i]
         if in_str:
             if ch == '\\' and i + 1 < len(line):
-                i += 2
-                continue
-            if ch == in_str:
-                in_str = None
+                i += 2; continue
+            if ch == in_str: in_str = None
         else:
-            if ch in quotes:
-                in_str = ch
-            elif line[i:i+len(cc)] == cc:
-                return i
+            if ch in quotes: in_str = ch
+            elif line[i:i+len(cc)] == cc: return i
         i += 1
     return -1
 
@@ -344,27 +197,21 @@ def highlight_code_part(line, theme, lang):
             q = ch
             j = i + 1
             while j < n:
-                if line[j] == q and line[j-1] != '\\':
-                    break
+                if line[j] == q and line[j-1] != '\\': break
                 j += 1
-            if j < n:
-                j += 1
+            if j < n: j += 1
             result += f'<tspan fill="{theme["string"]}">{esc(line[i:j])}</tspan>'
-            i = j
-            continue
+            i = j; continue
 
         if ch.isdigit():
             j = i
-            while j < n and (line[j].isdigit() or line[j] in '.xXbBoOabcdef_'):
-                j += 1
+            while j < n and (line[j].isdigit() or line[j] in '.xXbBoOabcdef_'): j += 1
             result += f'<tspan fill="{theme["number"]}">{esc(line[i:j])}</tspan>'
-            i = j
-            continue
+            i = j; continue
 
         if ch.isalpha() or ch == '_':
             j = i
-            while j < n and (line[j].isalnum() or line[j] == '_'):
-                j += 1
+            while j < n and (line[j].isalnum() or line[j] == '_'): j += 1
             word = line[i:j]
             wl, wu = word.lower(), word.upper()
             if word in kws or wl in kws or wu in kws:
@@ -377,16 +224,13 @@ def highlight_code_part(line, theme, lang):
                 result += f'<tspan fill="{theme["class"]}">{esc(word)}</tspan>'
             else:
                 result += f'<tspan fill="{theme["text"]}">{esc(word)}</tspan>'
-            i = j
-            continue
+            i = j; continue
 
         if ch in '+-*/%=<>!&|^~':
             j = i + 1
-            while j < n and line[j] in '+-*/%=<>!&|^~':
-                j += 1
+            while j < n and line[j] in '+-*/%=<>!&|^~': j += 1
             result += f'<tspan fill="{theme["keyword"]}">{esc(line[i:j])}</tspan>'
-            i = j
-            continue
+            i = j; continue
 
         result += esc(ch)
         i += 1
@@ -394,18 +238,13 @@ def highlight_code_part(line, theme, lang):
 
 
 def highlight_line(line, theme, lang):
-    if not line.strip():
-        return ""
+    if not line.strip(): return ""
     idx = find_comment(line, lang["comment"], lang["strings"])
     if idx != -1:
         return highlight_code_part(line[:idx], theme, lang) + \
                f'<tspan fill="{theme["comment"]}" font-style="italic">{esc(line[idx:])}</tspan>'
     return highlight_code_part(line, theme, lang)
 
-
-# ═══════════════════════════════════════════════════════════
-#                    🖼️ توليد SVG
-# ═══════════════════════════════════════════════════════════
 
 def wrap_text(text, max_chars):
     words = text.split()
@@ -415,13 +254,15 @@ def wrap_text(text, max_chars):
         if len(cur) + len(w) + 1 <= max_chars:
             cur += (" " if cur else "") + w
         else:
-            if cur:
-                lines.append(cur)
+            if cur: lines.append(cur)
             cur = w
-    if cur:
-        lines.append(cur)
+    if cur: lines.append(cur)
     return lines
 
+
+# ═══════════════════════════════════════════════════════════
+#                    🖼️ توليد SVG
+# ═══════════════════════════════════════════════════════════
 
 def generate_svg(code, theme_name, lang_name, bg_name, template_name,
                 watermark, show_numbers, filename,
@@ -447,10 +288,8 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
     code_h = num_lines * line_h + pad * 2 + header_h
 
     title_h = 0
-    if title.strip():
-        title_h += 50
-    if author.strip() or version.strip() or show_date:
-        title_h += 30
+    if title.strip(): title_h += 50
+    if author.strip() or version.strip() or show_date: title_h += 30
 
     desc_h = 0
     desc_lines = []
@@ -481,7 +320,7 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
             bg_defs = f'<pattern id="bgPat" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="20" y2="20" stroke="{theme["accent"]}" stroke-width="1" opacity="0.15"/></pattern>'
 
     parts = []
-    parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{W}" height="{H}" viewBox="0 0 {W} {H}" font-family="Consolas,Monaco,monospace">')
+    parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" font-family="Consolas,Monaco,monospace">')
     parts.append('<defs>')
     parts.append(bg_defs)
     if show_glow:
@@ -500,12 +339,9 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
 
     if author.strip() or version.strip() or show_date:
         meta = []
-        if author.strip():
-            meta.append(author)
-        if version.strip():
-            meta.append(f"v{version}")
-        if show_date:
-            meta.append(datetime.now().strftime('%Y-%m-%d'))
+        if author.strip(): meta.append(author)
+        if version.strip(): meta.append(f"v{version}")
+        if show_date: meta.append(datetime.now().strftime('%Y-%m-%d'))
         parts.append(f'<text x="{W // 2}" y="{y_off + 18}" text-anchor="middle" fill="{theme["accent"]}" font-size="13" font-family="Arial,sans-serif" opacity="0.9">{esc(" • ".join(meta))}</text>')
         y_off += 30
 
@@ -533,8 +369,7 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
     y_start = cy + header_h + pad + font
     for idx, line in enumerate(lines):
         y_pos = y_start + idx * line_h
-        if y_pos > cy + ch - pad // 2:
-            break
+        if y_pos > cy + ch - pad // 2: break
         if show_numbers:
             parts.append(f'<text x="{cx + pad + 30}" y="{y_pos}" text-anchor="end" fill="{theme["comment"]}" font-size="{font}" opacity="0.5">{idx + 1}</text>')
             tx = cx + pad + 50
@@ -564,28 +399,8 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
 # ═══════════════════════════════════════════════════════════
 
 def setup_site():
+    """إعداد الموقع بأمان - بدون run_js"""
     set_env(title=SITE_NAME, description=SITE_DESC, auto_scroll_bottom=True)
-    run_js(f'''
-    (function() {{
-        var old = document.querySelector("link[rel*='icon']");
-        if (old) old.remove();
-        var i = document.createElement('link');
-        i.rel = 'icon';
-        i.type = 'image/svg+xml';
-        i.href = '{SITE_ICON_URI}';
-        document.head.appendChild(i);
-
-        var apple = document.createElement('link');
-        apple.rel = 'apple-touch-icon';
-        apple.href = '{SITE_ICON_URI}';
-        document.head.appendChild(apple);
-
-        var meta = document.createElement('meta');
-        meta.name = 'theme-color';
-        meta.content = '#667eea';
-        document.head.appendChild(meta);
-    }})();
-    ''')
 
 
 def render_header():
@@ -594,33 +409,24 @@ def render_header():
         box-shadow:0 12px 32px rgba(102,126,234,0.3);color:white;">
         <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
             <div style="background:rgba(255,255,255,0.18);border-radius:16px;
-                padding:10px;display:flex;align-items:center;justify-content:center;
-                backdrop-filter: blur(10px);">
+                padding:10px;display:flex;align-items:center;justify-content:center;">
                 <div style="width:56px;height:56px;">{SITE_ICON_SVG}</div>
             </div>
             <div style="flex:1;min-width:200px;">
-                <h1 style="color:white;margin:0;font-size:27px;font-weight:800;
-                    letter-spacing:-0.5px;">CodeCanvas Pro</h1>
-                <p style="margin:6px 0 0 0;opacity:0.95;font-size:14px;">
-                    محرر صور الأكواد الاحترافي</p>
+                <h1 style="color:white;margin:0;font-size:27px;font-weight:800;">CodeCanvas Pro</h1>
+                <p style="margin:6px 0 0 0;opacity:0.95;font-size:14px;">محرر صور الأكواد الاحترافي</p>
             </div>
             <div style="text-align:right;">
                 <div style="background:rgba(255,255,255,0.18);padding:7px 16px;
-                    border-radius:22px;display:inline-block;font-size:12px;
-                    font-weight:600;backdrop-filter: blur(10px);">
+                    border-radius:22px;display:inline-block;font-size:12px;font-weight:600;">
                     v{SITE_VERSION}</div>
             </div>
         </div>
-        <div style="margin-top:20px;display:flex;gap:20px;flex-wrap:wrap;
-            font-size:13px;opacity:0.95;">
-            <span style="display:inline-flex;align-items:center;gap:7px;">
-                {icon("palette", 17, "white")} 25 ثيماً</span>
-            <span style="display:inline-flex;align-items:center;gap:7px;">
-                {icon("code", 17, "white")} 15 لغة</span>
-            <span style="display:inline-flex;align-items:center;gap:7px;">
-                {icon("image", 17, "white")} 10 قوالب</span>
-            <span style="display:inline-flex;align-items:center;gap:7px;">
-                {icon("brush", 17, "white")} 22 خلفية</span>
+        <div style="margin-top:20px;display:flex;gap:20px;flex-wrap:wrap;font-size:13px;opacity:0.95;">
+            <span style="display:inline-flex;align-items:center;gap:7px;">{icon("palette", 17, "white")} 25 ثيماً</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;">{icon("code", 17, "white")} 15 لغة</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;">{icon("image", 17, "white")} 10 قوالب</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;">{icon("brush", 17, "white")} 22 خلفية</span>
         </div>
     </div>''')
 
@@ -629,10 +435,8 @@ def render_footer():
     put_html(f'''<div style="text-align:center;padding:28px 20px;margin-top:32px;
         color:#888;border-top:1px solid #e0e0e0;font-size:13px;
         background:#fafafa;border-radius:12px;">
-        <div style="display:inline-flex;align-items:center;gap:10px;
-            justify-content:center;flex-wrap:wrap;margin-bottom:8px;">
-            <span style="width:22px;height:22px;display:inline-block;
-                vertical-align:middle;">{SITE_ICON_SVG}</span>
+        <div style="display:inline-flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:8px;">
+            <span style="width:22px;height:22px;display:inline-block;">{SITE_ICON_SVG}</span>
             <b style="color:#2c3e50;">CodeCanvas Pro</b>
             <span style="color:#bbb;">•</span>
             <span>v{SITE_VERSION}</span>
@@ -647,10 +451,8 @@ def render_footer():
 def section_title(icon_name, text, color="#667eea", subtitle=""):
     sub = f'<span style="font-size:13px;color:#888;font-weight:400;margin-right:10px;">{subtitle}</span>' if subtitle else ''
     put_html(f'''<div style="display:flex;align-items:center;gap:12px;
-        margin:26px 0 14px 0;padding-bottom:10px;
-        border-bottom:2px solid {color}22;">
-        <div style="background:{color}15;padding:8px;border-radius:10px;
-            display:flex;align-items:center;justify-content:center;">
+        margin:26px 0 14px 0;padding-bottom:10px;border-bottom:2px solid {color}22;">
+        <div style="background:{color}15;padding:8px;border-radius:10px;display:flex;align-items:center;justify-content:center;">
             <span style="color:{color};display:inline-flex;">{icon(icon_name, 20, color)}</span>
         </div>
         <span style="font-size:19px;font-weight:700;color:#2c3e50;">{text}</span>
@@ -680,58 +482,29 @@ greet("أحمد")''',
     )
 
     section_title("pencil", "الشرح والوصف", "#4CAF50", "اختياري")
-    title = input("عنوان الصورة:", type=TEXT, value="",
-                 required=False, placeholder="مثال: دالة الترحيب")
-    description = textarea(
-        "شرح الكود (يظهر تحت الصورة):",
-        rows=3, value="",
-        placeholder="اكتب شرحاً لوظيفة الكود..."
-    )
+    title = input("عنوان الصورة:", type=TEXT, value="", required=False, placeholder="مثال: دالة الترحيب")
+    description = textarea("شرح الكود:", rows=3, value="", placeholder="اكتب شرحاً لوظيفة الكود...")
 
     with put_collapse("معلومات إضافية (اختياري)"):
-        author = input("المؤلف:", type=TEXT, value="",
-                      required=False, placeholder="اسمك")
-        version = input("الإصدار:", type=TEXT, value="",
-                       required=False, placeholder="1.0")
-        show_date = radio("إظهار التاريخ:",
-                        options=["لا", "نعم"], value="لا",
-                        required=True, inline=True)
+        author = input("المؤلف:", type=TEXT, value="", required=False, placeholder="اسمك")
+        version = input("الإصدار:", type=TEXT, value="", required=False, placeholder="1.0")
+        show_date = radio("إظهار التاريخ:", options=["لا", "نعم"], value="لا", required=True, inline=True)
 
     section_title("palette", "التصميم", "#9C27B0")
-    lang_name = select("اللغة:",
-                      options=list(LANGUAGES.keys()),
-                      value="Python", required=True)
-    theme_name = select("الثيم:",
-                       options=list(THEMES.keys()),
-                       value="Monokai", required=True)
-    bg_name = select("الخلفية:",
-                    options=list(BACKGROUNDS.keys()),
-                    value="بدون (لون الثيم)", required=True)
-    template_name = select("القالب:",
-                          options=list(TEMPLATES.keys()),
-                          value="افتراضي", required=True)
+    lang_name = select("اللغة:", options=list(LANGUAGES.keys()), value="Python", required=True)
+    theme_name = select("الثيم:", options=list(THEMES.keys()), value="Monokai", required=True)
+    bg_name = select("الخلفية:", options=list(BACKGROUNDS.keys()), value="بدون (لون الثيم)", required=True)
+    template_name = select("القالب:", options=list(TEMPLATES.keys()), value="افتراضي", required=True)
 
     with put_collapse("تأثيرات بصرية متقدمة (اختياري)"):
-        show_glow = radio("توهج حول البطاقة:",
-                        options=["لا", "نعم"], value="لا",
-                        required=True, inline=True)
-        show_border = radio("إطار ملون:",
-                          options=["لا", "نعم"], value="لا",
-                          required=True, inline=True)
-        border_color = input("لون الإطار (hex):",
-                           type=TEXT, value="#667eea",
-                           required=False, placeholder="#667eea")
+        show_glow = radio("توهج حول البطاقة:", options=["لا", "نعم"], value="لا", required=True, inline=True)
+        show_border = radio("إطار ملون:", options=["لا", "نعم"], value="لا", required=True, inline=True)
+        border_color = input("لون الإطار (hex):", type=TEXT, value="#667eea", required=False)
 
     section_title("list", "تفاصيل إضافية", "#FF9800")
-    filename = input("اسم الملف:",
-                    type=TEXT, value="",
-                    required=False, placeholder="مثال: app.py")
-    watermark = input("علامة مائية:",
-                     type=TEXT, value="",
-                     required=False, placeholder="مثال: @username")
-    show_numbers = radio("أرقام الأسطر:",
-                        options=["نعم", "لا"], value="نعم",
-                        required=True, inline=True)
+    filename = input("اسم الملف:", type=TEXT, value="", required=False, placeholder="مثال: app.py")
+    watermark = input("علامة مائية:", type=TEXT, value="", required=False, placeholder="مثال: @username")
+    show_numbers = radio("أرقام الأسطر:", options=["نعم", "لا"], value="نعم", required=True, inline=True)
 
     put_html('<div style="height:24px;"></div>')
     put_buttons(
@@ -779,183 +552,85 @@ def do_generate(**kwargs):
             put_error(f"خطأ في التوليد: {e}")
             return
 
-        # حفظ SVG كـ base64 في متغير JS
         svg_b64 = base64.b64encode(svg_str.encode('utf-8')).decode('ascii')
 
         put_html(f'''
-        <div style="background:#e8e8e8;padding:20px;border-radius:12px;
-            text-align:center;margin:15px 0;overflow:auto;">
-            <div id="svgWrapper" style="display:inline-block;
-                box-shadow:0 10px 30px rgba(0,0,0,0.25);border-radius:8px;
-                overflow:hidden;">
+        <div style="background:#e8e8e8;padding:20px;border-radius:12px;text-align:center;margin:15px 0;overflow:auto;">
+            <div id="svgWrapper" style="display:inline-block;box-shadow:0 10px 30px rgba(0,0,0,0.25);border-radius:8px;overflow:hidden;">
                 {svg_str}
             </div>
         </div>
         <script>
-            window.__codecanvas_svg = atob("{svg_b64}");
-            window.__codecanvas_w = {w};
-            window.__codecanvas_h = {h};
+            window.__cc_svg_b64 = "{svg_b64}";
+            window.__cc_w = {w};
+            window.__cc_h = {h};
         </script>
         ''')
 
         info_items = [f"{w}×{h} px", kwargs['theme_name'], kwargs['lang_name']]
-        if kwargs['title'].strip():
-            info_items.append(kwargs['title'])
-        if kwargs['description'].strip():
-            info_items.append("مع شرح")
+        if kwargs['title'].strip(): info_items.append(kwargs['title'])
+        if kwargs['description'].strip(): info_items.append("مع شرح")
         put_info(" | ".join(info_items))
 
         section_title("download", "التحميل", "#2196F3", "اختر الصيغة")
 
         base_name = kwargs['filename'].strip().rsplit(".", 1)[0] if kwargs['filename'].strip() else "code"
-        if not base_name:
-            base_name = "code"
+        if not base_name: base_name = "code"
         safe_name = "".join(c for c in base_name if c.isalnum() or c in "_-")
         theme_safe = "".join(c for c in kwargs['theme_name'] if c.isalnum() or c in "_-")
         out_name = f"{safe_name}_{theme_safe}"
 
-        # ═══════════════════════════════════════════
-        #   JavaScript المحسّن للتحميل (مصلح)
-        # ═══════════════════════════════════════════
-
-        # كود مشترك: تحويل SVG string إلى Canvas
-        common_js = '''
-        function svgToCanvas(svgString, width, height, bgColor) {
+        # كود JS الأساسي
+        common = '''
+        function svgToCanvas(b64, width, height, bgColor) {
             return new Promise(function(resolve, reject) {
+                var svgString = atob(b64);
                 var canvas = document.createElement('canvas');
                 var scale = 2;
                 canvas.width = width * scale;
                 canvas.height = height * scale;
                 var ctx = canvas.getContext('2d');
-
                 if (bgColor) {
                     ctx.fillStyle = bgColor;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
                 }
-
                 var img = new Image();
-                img.crossOrigin = 'anonymous';
-
+                var blob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+                var url = URL.createObjectURL(blob);
                 img.onload = function() {
                     ctx.scale(scale, scale);
                     ctx.drawImage(img, 0, 0, width, height);
+                    URL.revokeObjectURL(url);
                     resolve(canvas);
                 };
-
-                img.onerror = function(e) {
+                img.onerror = function() {
+                    URL.revokeObjectURL(url);
                     reject('فشل تحميل الصورة');
                 };
-
-                // استخدام Blob URL بدلاً من data URI لتفادي مشاكل CORS
-                var blob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-                var url = URL.createObjectURL(blob);
                 img.src = url;
             });
         }
-
-        function downloadCanvas(canvas, format, quality, filename) {
+        function dl(canvas, fmt, q, name) {
             canvas.toBlob(function(blob) {
                 var url = URL.createObjectURL(blob);
                 var a = document.createElement('a');
                 a.href = url;
-                a.download = filename;
+                a.download = name;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
-            }, 'image/' + format, quality);
+                setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+            }, 'image/' + fmt, q);
         }
         '''
 
-        # PNG
-        png_js = f'''
-        (function() {{
-            try {{
-                var svgStr = window.__codecanvas_svg;
-                var w = window.__codecanvas_w;
-                var h = window.__codecanvas_h;
+        png_js = f'''(function(){{var b64=window.__cc_svg_b64;var w=window.__cc_w;var h=window.__cc_h;if(!b64){{alert('ولّد الصورة أولاً');return;}}{common}svgToCanvas(b64,w,h,null).then(function(c){{dl(c,'png',1.0,'{out_name}.png');}}).catch(function(e){{alert(e);}});}})();'''
 
-                if (!svgStr) {{ alert('الرجاء توليد الصورة أولاً'); return; }}
+        jpg_js = f'''(function(){{var b64=window.__cc_svg_b64;var w=window.__cc_w;var h=window.__cc_h;if(!b64){{alert('ولّد الصورة أولاً');return;}}{common}svgToCanvas(b64,w,h,'#ffffff').then(function(c){{dl(c,'jpeg',0.95,'{out_name}.jpg');}}).catch(function(e){{alert(e);}});}})();'''
 
-                {common_js}
+        webp_js = f'''(function(){{var b64=window.__cc_svg_b64;var w=window.__cc_w;var h=window.__cc_h;if(!b64){{alert('ولّد الصورة أولاً');return;}}{common}svgToCanvas(b64,w,h,null).then(function(c){{dl(c,'webp',0.95,'{out_name}.webp');}}).catch(function(e){{alert(e);}});}})();'''
 
-                svgToCanvas(svgStr, w, h, null).then(function(canvas) {{
-                    downloadCanvas(canvas, 'png', 1.0, '{out_name}.png');
-                }}).catch(function(err) {{
-                    alert('خطأ: ' + err);
-                }});
-            }} catch(e) {{
-                alert('خطأ: ' + e.message);
-            }}
-        }})();
-        '''
-
-        # JPG
-        jpg_js = f'''
-        (function() {{
-            try {{
-                var svgStr = window.__codecanvas_svg;
-                var w = window.__codecanvas_w;
-                var h = window.__codecanvas_h;
-
-                if (!svgStr) {{ alert('الرجاء توليد الصورة أولاً'); return; }}
-
-                {common_js}
-
-                svgToCanvas(svgStr, w, h, '#ffffff').then(function(canvas) {{
-                    downloadCanvas(canvas, 'jpeg', 0.95, '{out_name}.jpg');
-                }}).catch(function(err) {{
-                    alert('خطأ: ' + err);
-                }});
-            }} catch(e) {{
-                alert('خطأ: ' + e.message);
-            }}
-        }})();
-        '''
-
-        # WebP
-        webp_js = f'''
-        (function() {{
-            try {{
-                var svgStr = window.__codecanvas_svg;
-                var w = window.__codecanvas_w;
-                var h = window.__codecanvas_h;
-
-                if (!svgStr) {{ alert('الرجاء توليد الصورة أولاً'); return; }}
-
-                {common_js}
-
-                svgToCanvas(svgStr, w, h, null).then(function(canvas) {{
-                    downloadCanvas(canvas, 'webp', 0.95, '{out_name}.webp');
-                }}).catch(function(err) {{
-                    alert('خطأ: ' + err);
-                }});
-            }} catch(e) {{
-                alert('خطأ: ' + e.message);
-            }}
-        }})();
-        '''
-
-        # SVG مباشرة
-        svg_js = f'''
-        (function() {{
-            try {{
-                var svgStr = window.__codecanvas_svg;
-                if (!svgStr) {{ alert('الرجاء توليد الصورة أولاً'); return; }}
-                var blob = new Blob([svgStr], {{type: 'image/svg+xml;charset=utf-8'}});
-                var url = URL.createObjectURL(blob);
-                var a = document.createElement('a');
-                a.href = url;
-                a.download = '{out_name}.svg';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                setTimeout(function() {{ URL.revokeObjectURL(url); }}, 1000);
-            }} catch(e) {{
-                alert('خطأ: ' + e.message);
-            }}
-        }})();
-        '''
+        svg_js = f'''(function(){{var b64=window.__cc_svg_b64;if(!b64){{alert('ولّد الصورة أولاً');return;}}var svgString=atob(b64);var blob=new Blob([svgString],{{type:'image/svg+xml;charset=utf-8'}});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='{out_name}.svg';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){{URL.revokeObjectURL(url);}},1000);}})();'''
 
         put_buttons(
             ['تحميل PNG', 'تحميل JPG', 'تحميل WebP', 'تحميل SVG', 'طباعة'],
