@@ -379,7 +379,7 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
 
 
 def setup_site():
-    set_env(title=SITE_NAME, description=SITE_DESC, auto_scroll_bottom=True)
+    set_env(title=SITE_NAME, auto_scroll_bottom=True)
 
 
 def render_header():
