@@ -991,23 +991,10 @@ def random_theme_then_regenerate(**kwargs):
 # ═══════════════════════════════════════════════════════════
 
 if __name__ == '__main__':
-    import socket
-
-    def find_free_port(start=8080, end=8100):
-        for p in range(start, end):
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                try:
-                    s.bind(('', p))
-                    return p
-                except OSError:
-                    continue
-        return start
-
-    port = find_free_port()
+    import os
+    port = int(os.environ.get('PORT', 8080))
     print(f"\n{'='*60}")
-    print(f"  🎨 مولد صور الأكواد v4.0")
-    print(f"  🌐 http://localhost:{port}")
-    print(f"  📊 25 ثيم × 15 لغة × 10 قوالب × 22 خلفية")
-    print(f"  👨‍💻 Muhammed Alaa © 2026")
+    print(f"  CodeCanvas Pro v{SITE_VERSION}")
+    print(f"  Port: {port}")
     print(f"{'='*60}\n")
-    start_server(main, port=port, debug=False)
+    start_server(main, port=port, host='0.0.0.0', debug=False)
