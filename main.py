@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-CodeCanvas Pro v6.1 - محرر صور الأكواد الاحترافي
+CodeCanvas Pro v6.3 - محرر صور الأكواد الاحترافي
 Developed by Muhammed Alaa © 2026
 """
 from pywebio import start_server
 from pywebio.input import input, TEXT, textarea, select, radio
 from pywebio.output import (
-    put_html, put_markdown, put_buttons, put_grid,
-    put_info, put_warning, put_error,
+    put_html, put_markdown, put_buttons, put_info, put_error,
     clear, toast, use_scope, put_collapse
 )
 from pywebio.session import set_env, run_js
@@ -22,53 +21,27 @@ from datetime import datetime
 
 SITE_NAME = "CodeCanvas Pro — محرر صور الأكواد"
 SITE_DESC = "حوّل أكوادك إلى صور احترافية بـ 25 ثيماً و 15 لغة"
-SITE_VERSION = "6.1"
+SITE_VERSION = "6.3"
 AUTHOR = "Muhammed Alaa"
 COPYRIGHT = f"{AUTHOR} © 2026"
 
-SITE_ICON_SVG = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect x="4" y="4" width="56" height="56" rx="14" fill="url(#lg1)"/><rect x="11" y="15" width="42" height="34" rx="4" fill="#ffffff" opacity="0.12"/><rect x="11" y="15" width="42" height="9" rx="4" fill="#ffffff" opacity="0.22"/><circle cx="15" cy="19.5" r="1.6" fill="#ff5f56"/><circle cx="20" cy="19.5" r="1.6" fill="#ffbd2e"/><circle cx="25" cy="19.5" r="1.6" fill="#27c93f"/><path d="M 18 29 L 22 33 L 18 37" stroke="#00ff9f" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="27" y1="37" x2="36" y2="37" stroke="#00ff9f" stroke-width="2.5" stroke-linecap="round"/><circle cx="44" cy="32" r="3.5" fill="#f92672"/><circle cx="48" cy="27" r="2.5" fill="#e6db74"/><circle cx="47" cy="39" r="2.5" fill="#66d9ef"/></svg>'''
-
-SITE_ICON_B64 = base64.b64encode(SITE_ICON_SVG.encode('utf-8')).decode('ascii')
-SITE_ICON_URI = f"data:image/svg+xml;base64,{SITE_ICON_B64}"
-
-
-# ═══════════════════════════════════════════════════════════
-#                    🎯 مكتبة الأيقونات
-# ═══════════════════════════════════════════════════════════
+SITE_ICON_SVG = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#667eea"/><stop offset="100%" stop-color="#764ba2"/></linearGradient></defs><rect x="4" y="4" width="56" height="56" rx="14" fill="url(#lg1)"/><rect x="11" y="15" width="42" height="34" rx="4" fill="#ffffff" opacity="0.12"/><rect x="11" y="15" width="42" height="9" rx="4" fill="#ffffff" opacity="0.22"/><circle cx="15" cy="19.5" r="1.6" fill="#ff5f56"/><circle cx="20" cy="19.5" r="1.6" fill="#ffbd2e"/><circle cx="25" cy="19.5" r="1.6" fill="#27c93f"/><path d="M 18 29 L 22 33 L 18 37" stroke="#00ff9f" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="27" y1="37" x2="36" y2="37" stroke="#00ff9f" stroke-width="2.5" stroke-linecap="round"/><circle cx="44" cy="32" r="3.5" fill="#f92672"/><circle cx="48" cy="27" r="2.5" fill="#e6db74"/><circle cx="47" cy="39" r="2.5" fill="#66d9ef"/></svg>'
 
 ICONS = {
     "code": '<path d="M 8 6 L 2 12 L 8 18 M 16 6 L 22 12 L 16 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
-    "text": '<path d="M 4 4 L 20 4 M 12 4 L 12 20 M 4 4 L 4 8 M 20 4 L 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
     "palette": '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="8.5" cy="10" r="1.2" fill="currentColor"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="10" r="1.2" fill="currentColor"/><circle cx="13.5" cy="14.5" r="1.2" fill="currentColor"/>',
-    "settings": '<circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M 12 2 L 12 5 M 12 19 L 12 22 M 4.2 4.2 L 6.3 6.3 M 17.7 17.7 L 19.8 19.8 M 2 12 L 5 12 M 19 12 L 22 12 M 4.2 19.8 L 6.3 17.7 M 17.7 6.3 L 19.8 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
     "download": '<path d="M 12 3 L 12 15 M 7 10 L 12 15 L 17 10 M 3 17 L 3 21 L 21 21 L 21 17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
     "image": '<rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="9" cy="9" r="2" fill="currentColor"/><path d="M 3 17 L 9 11 L 13 15 L 17 11 L 21 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
-    "user": '<circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M 4 21 C 4 17 7 14 12 14 C 17 14 20 17 20 21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
-    "calendar": '<rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/><line x1="8" y1="3" x2="8" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
-    "tag": '<path d="M 3 12 L 12 3 L 21 3 L 21 12 L 12 21 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><circle cx="17" cy="7" r="1.5" fill="currentColor"/>',
-    "sparkle": '<path d="M 12 2 L 13.5 9.5 L 21 11 L 13.5 12.5 L 12 20 L 10.5 12.5 L 3 11 L 10.5 9.5 Z" fill="currentColor"/>',
-    "list": '<line x1="9" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/>',
-    "language": '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><path d="M 3 12 L 21 12 M 12 3 C 16 7 16 17 12 21 M 12 3 C 8 7 8 17 12 21" stroke="currentColor" stroke-width="2" fill="none"/>',
-    "brush": '<path d="M 20 3 L 12 11 L 8 7 L 20 3 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M 8 7 L 5 15 L 4 20 L 9 19 L 12 11" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
-    "star": '<polygon points="12,2 15,9 22,9.5 17,14.5 18.5,22 12,18 5.5,22 7,14.5 2,9.5 9,9" fill="currentColor"/>',
-    "glow": '<circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none" opacity="0.25"/>',
-    "border": '<rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="4,3"/>',
     "pencil": '<path d="M 3 21 L 4 16 L 16 4 L 20 8 L 8 20 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><line x1="14" y1="6" x2="18" y2="10" stroke="currentColor" stroke-width="2"/>',
-    "refresh": '<path d="M 20 12 A 8 8 0 1 1 12 4 M 12 4 L 16 8 M 12 4 L 16 0" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
-    "random": '<path d="M 16 4 L 21 8 L 16 12 M 21 8 L 3 8 M 8 12 L 3 16 L 8 20 M 3 16 L 21 16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
-    "printer": '<path d="M 6 9 L 6 3 L 18 3 L 18 9 M 6 18 L 3 18 L 3 9 L 21 9 L 21 18 L 18 18 M 6 14 L 18 14 L 18 22 L 6 22 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
+    "brush": '<path d="M 20 3 L 12 11 L 8 7 L 20 3 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M 8 7 L 5 15 L 4 20 L 9 19 L 12 11" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
+    "list": '<line x1="9" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/>',
     "heart": '<path d="M 12 21 C 12 21 3 14 3 8.5 C 3 5.5 5.5 3 8.5 3 C 10.5 3 12 4.5 12 4.5 C 12 4.5 13.5 3 15.5 3 C 18.5 3 21 5.5 21 8.5 C 21 14 12 21 12 21 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
 }
-
 
 def icon(name, size=20, color="currentColor"):
     path = ICONS.get(name, ICONS["code"]).replace("currentColor", color)
     return f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 24 24" style="vertical-align:middle;display:inline-block;flex-shrink:0;">{path}</svg>'
 
-
-# ═══════════════════════════════════════════════════════════
-#                    🎨 الثيمات (25)
-# ═══════════════════════════════════════════════════════════
 
 THEMES = {
     "Monokai": {"bg": "#272822", "text": "#f8f8f2", "comment": "#75715e", "keyword": "#f92672", "string": "#e6db74", "number": "#ae81ff", "function": "#a6e22e", "class": "#66d9ef", "accent": "#fd971f", "window_bg": "#3e3d32"},
@@ -98,7 +71,6 @@ THEMES = {
     "Sunset": {"bg": "#2b1055", "text": "#f8f8f2", "comment": "#a09ebb", "keyword": "#ff79c6", "string": "#f1fa8c", "number": "#bd93f9", "function": "#50fa7b", "class": "#8be9fd", "accent": "#ff79c6", "window_bg": "#3a1a6b"},
 }
 
-
 BACKGROUNDS = {
     "بدون (لون الثيم)": {"type": "theme"},
     "أسود": {"type": "solid", "color": "#000000"},
@@ -125,7 +97,6 @@ BACKGROUNDS = {
     "نقش خطوط": {"type": "pattern", "pattern": "lines"},
 }
 
-
 TEMPLATES = {
     "افتراضي": {"padding": 25, "font": 14, "radius": 12, "show_window": True},
     "بدون نافذة": {"padding": 20, "font": 14, "radius": 0, "show_window": False},
@@ -138,7 +109,6 @@ TEMPLATES = {
     "عرض تقديمي": {"padding": 60, "font": 20, "radius": 20, "show_window": True},
     "شاشة كاملة": {"padding": 80, "font": 22, "radius": 24, "show_window": True},
 }
-
 
 LANGUAGES = {
     "Python": {"keywords": {'False','None','True','and','as','assert','async','await','break','class','continue','def','del','elif','else','except','finally','for','from','global','if','import','in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield','self'}, "builtins": {'print','len','range','str','int','float','list','dict','set','tuple','bool','input','type','sum','max','min','sorted','enumerate','zip','map','filter','abs','round','all','any','open','isinstance'}, "comment": "#", "strings": ['"', "'"], "filename": "main.py"},
@@ -159,10 +129,6 @@ LANGUAGES = {
 }
 
 
-# ═══════════════════════════════════════════════════════════
-#                    🎨 التلوين
-# ═══════════════════════════════════════════════════════════
-
 def esc(t):
     return html_module.escape(t)
 
@@ -174,11 +140,15 @@ def find_comment(line, cc, quotes):
         ch = line[i]
         if in_str:
             if ch == '\\' and i + 1 < len(line):
-                i += 2; continue
-            if ch == in_str: in_str = None
+                i += 2
+                continue
+            if ch == in_str:
+                in_str = None
         else:
-            if ch in quotes: in_str = ch
-            elif line[i:i+len(cc)] == cc: return i
+            if ch in quotes:
+                in_str = ch
+            elif line[i:i+len(cc)] == cc:
+                return i
         i += 1
     return -1
 
@@ -197,21 +167,27 @@ def highlight_code_part(line, theme, lang):
             q = ch
             j = i + 1
             while j < n:
-                if line[j] == q and line[j-1] != '\\': break
+                if line[j] == q and line[j-1] != '\\':
+                    break
                 j += 1
-            if j < n: j += 1
+            if j < n:
+                j += 1
             result += f'<tspan fill="{theme["string"]}">{esc(line[i:j])}</tspan>'
-            i = j; continue
+            i = j
+            continue
 
         if ch.isdigit():
             j = i
-            while j < n and (line[j].isdigit() or line[j] in '.xXbBoOabcdef_'): j += 1
+            while j < n and (line[j].isdigit() or line[j] in '.xXbBoOabcdef_'):
+                j += 1
             result += f'<tspan fill="{theme["number"]}">{esc(line[i:j])}</tspan>'
-            i = j; continue
+            i = j
+            continue
 
         if ch.isalpha() or ch == '_':
             j = i
-            while j < n and (line[j].isalnum() or line[j] == '_'): j += 1
+            while j < n and (line[j].isalnum() or line[j] == '_'):
+                j += 1
             word = line[i:j]
             wl, wu = word.lower(), word.upper()
             if word in kws or wl in kws or wu in kws:
@@ -224,13 +200,16 @@ def highlight_code_part(line, theme, lang):
                 result += f'<tspan fill="{theme["class"]}">{esc(word)}</tspan>'
             else:
                 result += f'<tspan fill="{theme["text"]}">{esc(word)}</tspan>'
-            i = j; continue
+            i = j
+            continue
 
         if ch in '+-*/%=<>!&|^~':
             j = i + 1
-            while j < n and line[j] in '+-*/%=<>!&|^~': j += 1
+            while j < n and line[j] in '+-*/%=<>!&|^~':
+                j += 1
             result += f'<tspan fill="{theme["keyword"]}">{esc(line[i:j])}</tspan>'
-            i = j; continue
+            i = j
+            continue
 
         result += esc(ch)
         i += 1
@@ -238,7 +217,8 @@ def highlight_code_part(line, theme, lang):
 
 
 def highlight_line(line, theme, lang):
-    if not line.strip(): return ""
+    if not line.strip():
+        return ""
     idx = find_comment(line, lang["comment"], lang["strings"])
     if idx != -1:
         return highlight_code_part(line[:idx], theme, lang) + \
@@ -254,15 +234,13 @@ def wrap_text(text, max_chars):
         if len(cur) + len(w) + 1 <= max_chars:
             cur += (" " if cur else "") + w
         else:
-            if cur: lines.append(cur)
+            if cur:
+                lines.append(cur)
             cur = w
-    if cur: lines.append(cur)
+    if cur:
+        lines.append(cur)
     return lines
 
-
-# ═══════════════════════════════════════════════════════════
-#                    🖼️ توليد SVG
-# ═══════════════════════════════════════════════════════════
 
 def generate_svg(code, theme_name, lang_name, bg_name, template_name,
                 watermark, show_numbers, filename,
@@ -288,8 +266,10 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
     code_h = num_lines * line_h + pad * 2 + header_h
 
     title_h = 0
-    if title.strip(): title_h += 50
-    if author.strip() or version.strip() or show_date: title_h += 30
+    if title.strip():
+        title_h += 50
+    if author.strip() or version.strip() or show_date:
+        title_h += 30
 
     desc_h = 0
     desc_lines = []
@@ -339,9 +319,12 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
 
     if author.strip() or version.strip() or show_date:
         meta = []
-        if author.strip(): meta.append(author)
-        if version.strip(): meta.append(f"v{version}")
-        if show_date: meta.append(datetime.now().strftime('%Y-%m-%d'))
+        if author.strip():
+            meta.append(author)
+        if version.strip():
+            meta.append(f"v{version}")
+        if show_date:
+            meta.append(datetime.now().strftime('%Y-%m-%d'))
         parts.append(f'<text x="{W // 2}" y="{y_off + 18}" text-anchor="middle" fill="{theme["accent"]}" font-size="13" font-family="Arial,sans-serif" opacity="0.9">{esc(" • ".join(meta))}</text>')
         y_off += 30
 
@@ -369,7 +352,8 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
     y_start = cy + header_h + pad + font
     for idx, line in enumerate(lines):
         y_pos = y_start + idx * line_h
-        if y_pos > cy + ch - pad // 2: break
+        if y_pos > cy + ch - pad // 2:
+            break
         if show_numbers:
             parts.append(f'<text x="{cx + pad + 30}" y="{y_pos}" text-anchor="end" fill="{theme["comment"]}" font-size="{font}" opacity="0.5">{idx + 1}</text>')
             tx = cx + pad + 50
@@ -394,22 +378,14 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
     return ''.join(parts), W, H
 
 
-# ═══════════════════════════════════════════════════════════
-#                    🎨 الواجهة
-# ═══════════════════════════════════════════════════════════
-
 def setup_site():
-    """إعداد الموقع بأمان - بدون run_js"""
     set_env(title=SITE_NAME, description=SITE_DESC, auto_scroll_bottom=True)
 
 
 def render_header():
-    put_html(f'''<div style="background:linear-gradient(135deg,#667eea,#764ba2);
-        padding:25px 30px;border-radius:16px;margin-bottom:24px;
-        box-shadow:0 12px 32px rgba(102,126,234,0.3);color:white;">
+    put_html(f'''<div style="background:linear-gradient(135deg,#667eea,#764ba2);padding:25px 30px;border-radius:16px;margin-bottom:24px;box-shadow:0 12px 32px rgba(102,126,234,0.3);color:white;">
         <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
-            <div style="background:rgba(255,255,255,0.18);border-radius:16px;
-                padding:10px;display:flex;align-items:center;justify-content:center;">
+            <div style="background:rgba(255,255,255,0.18);border-radius:16px;padding:10px;display:flex;align-items:center;justify-content:center;">
                 <div style="width:56px;height:56px;">{SITE_ICON_SVG}</div>
             </div>
             <div style="flex:1;min-width:200px;">
@@ -417,9 +393,7 @@ def render_header():
                 <p style="margin:6px 0 0 0;opacity:0.95;font-size:14px;">محرر صور الأكواد الاحترافي</p>
             </div>
             <div style="text-align:right;">
-                <div style="background:rgba(255,255,255,0.18);padding:7px 16px;
-                    border-radius:22px;display:inline-block;font-size:12px;font-weight:600;">
-                    v{SITE_VERSION}</div>
+                <div style="background:rgba(255,255,255,0.18);padding:7px 16px;border-radius:22px;display:inline-block;font-size:12px;font-weight:600;">v{SITE_VERSION}</div>
             </div>
         </div>
         <div style="margin-top:20px;display:flex;gap:20px;flex-wrap:wrap;font-size:13px;opacity:0.95;">
@@ -432,9 +406,7 @@ def render_header():
 
 
 def render_footer():
-    put_html(f'''<div style="text-align:center;padding:28px 20px;margin-top:32px;
-        color:#888;border-top:1px solid #e0e0e0;font-size:13px;
-        background:#fafafa;border-radius:12px;">
+    put_html(f'''<div style="text-align:center;padding:28px 20px;margin-top:32px;color:#888;border-top:1px solid #e0e0e0;font-size:13px;background:#fafafa;border-radius:12px;">
         <div style="display:inline-flex;align-items:center;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:8px;">
             <span style="width:22px;height:22px;display:inline-block;">{SITE_ICON_SVG}</span>
             <b style="color:#2c3e50;">CodeCanvas Pro</b>
@@ -450,8 +422,7 @@ def render_footer():
 
 def section_title(icon_name, text, color="#667eea", subtitle=""):
     sub = f'<span style="font-size:13px;color:#888;font-weight:400;margin-right:10px;">{subtitle}</span>' if subtitle else ''
-    put_html(f'''<div style="display:flex;align-items:center;gap:12px;
-        margin:26px 0 14px 0;padding-bottom:10px;border-bottom:2px solid {color}22;">
+    put_html(f'''<div style="display:flex;align-items:center;gap:12px;margin:26px 0 14px 0;padding-bottom:10px;border-bottom:2px solid {color}22;">
         <div style="background:{color}15;padding:8px;border-radius:10px;display:flex;align-items:center;justify-content:center;">
             <span style="color:{color};display:inline-flex;">{icon(icon_name, 20, color)}</span>
         </div>
@@ -460,26 +431,16 @@ def section_title(icon_name, text, color="#667eea", subtitle=""):
     </div>''')
 
 
-# ═══════════════════════════════════════════════════════════
-#                    🎯 التطبيق
-# ═══════════════════════════════════════════════════════════
-
 def main():
     setup_site()
     clear()
     render_header()
 
     section_title("code", "الكود", "#667eea", "الصق أو اكتب كودك هنا")
-    code = textarea(
-        "الكود:",
-        value='''def greet(name):
+    code = textarea("الكود:", value='''def greet(name):
     print(f"مرحباً {name}!")
 
-greet("أحمد")''',
-        rows=12,
-        code={'mode': 'python'},
-        placeholder="الصق كودك هنا..."
-    )
+greet("أحمد")''', rows=12, code={'mode': 'python'}, placeholder="الصق كودك هنا...")
 
     section_title("pencil", "الشرح والوصف", "#4CAF50", "اختياري")
     title = input("عنوان الصورة:", type=TEXT, value="", required=False, placeholder="مثال: دالة الترحيب")
@@ -561,56 +522,62 @@ def do_generate(**kwargs):
             </div>
         </div>
         <script>
-            window.__cc_svg_b64 = "{svg_b64}";
+            window.__cc_b64 = "{svg_b64}";
             window.__cc_w = {w};
             window.__cc_h = {h};
         </script>
         ''')
 
         info_items = [f"{w}×{h} px", kwargs['theme_name'], kwargs['lang_name']]
-        if kwargs['title'].strip(): info_items.append(kwargs['title'])
-        if kwargs['description'].strip(): info_items.append("مع شرح")
+        if kwargs['title'].strip():
+            info_items.append(kwargs['title'])
+        if kwargs['description'].strip():
+            info_items.append("مع شرح")
         put_info(" | ".join(info_items))
 
         section_title("download", "التحميل", "#2196F3", "اختر الصيغة")
 
         base_name = kwargs['filename'].strip().rsplit(".", 1)[0] if kwargs['filename'].strip() else "code"
-        if not base_name: base_name = "code"
+        if not base_name:
+            base_name = "code"
         safe_name = "".join(c for c in base_name if c.isalnum() or c in "_-")
         theme_safe = "".join(c for c in kwargs['theme_name'] if c.isalnum() or c in "_-")
         out_name = f"{safe_name}_{theme_safe}"
 
-        # كود JS الأساسي
         common = '''
         function svgToCanvas(b64, width, height, bgColor) {
             return new Promise(function(resolve, reject) {
-                var svgString = atob(b64);
-                var canvas = document.createElement('canvas');
-                var scale = 2;
-                canvas.width = width * scale;
-                canvas.height = height * scale;
-                var ctx = canvas.getContext('2d');
-                if (bgColor) {
-                    ctx.fillStyle = bgColor;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                try {
+                    var svgString = atob(b64);
+                    var canvas = document.createElement('canvas');
+                    var scale = 2;
+                    canvas.width = width * scale;
+                    canvas.height = height * scale;
+                    var ctx = canvas.getContext('2d');
+                    if (bgColor) {
+                        ctx.fillStyle = bgColor;
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    }
+                    var img = new Image();
+                    var blob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+                    var url = URL.createObjectURL(blob);
+                    img.onload = function() {
+                        ctx.scale(scale, scale);
+                        ctx.drawImage(img, 0, 0, width, height);
+                        URL.revokeObjectURL(url);
+                        resolve(canvas);
+                    };
+                    img.onerror = function() {
+                        URL.revokeObjectURL(url);
+                        reject('فشل تحميل الصورة');
+                    };
+                    img.src = url;
+                } catch(e) {
+                    reject(e.message);
                 }
-                var img = new Image();
-                var blob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-                var url = URL.createObjectURL(blob);
-                img.onload = function() {
-                    ctx.scale(scale, scale);
-                    ctx.drawImage(img, 0, 0, width, height);
-                    URL.revokeObjectURL(url);
-                    resolve(canvas);
-                };
-                img.onerror = function() {
-                    URL.revokeObjectURL(url);
-                    reject('فشل تحميل الصورة');
-                };
-                img.src = url;
             });
         }
-        function dl(canvas, fmt, q, name) {
+        function dlFile(canvas, fmt, q, name) {
             canvas.toBlob(function(blob) {
                 var url = URL.createObjectURL(blob);
                 var a = document.createElement('a');
@@ -624,13 +591,13 @@ def do_generate(**kwargs):
         }
         '''
 
-        png_js = f'''(function(){{var b64=window.__cc_svg_b64;var w=window.__cc_w;var h=window.__cc_h;if(!b64){{alert('ولّد الصورة أولاً');return;}}{common}svgToCanvas(b64,w,h,null).then(function(c){{dl(c,'png',1.0,'{out_name}.png');}}).catch(function(e){{alert(e);}});}})();'''
+        png_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('ولّد أولاً');return;}}{common}svgToCanvas(b64,window.__cc_w,window.__cc_h,null).then(function(c){{dlFile(c,'png',1.0,'{out_name}.png');}}).catch(function(e){{alert('خطأ: '+e);}});}})();'''
 
-        jpg_js = f'''(function(){{var b64=window.__cc_svg_b64;var w=window.__cc_w;var h=window.__cc_h;if(!b64){{alert('ولّد الصورة أولاً');return;}}{common}svgToCanvas(b64,w,h,'#ffffff').then(function(c){{dl(c,'jpeg',0.95,'{out_name}.jpg');}}).catch(function(e){{alert(e);}});}})();'''
+        jpg_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('ولّد أولاً');return;}}{common}svgToCanvas(b64,window.__cc_w,window.__cc_h,'#ffffff').then(function(c){{dlFile(c,'jpeg',0.95,'{out_name}.jpg');}}).catch(function(e){{alert('خطأ: '+e);}});}})();'''
 
-        webp_js = f'''(function(){{var b64=window.__cc_svg_b64;var w=window.__cc_w;var h=window.__cc_h;if(!b64){{alert('ولّد الصورة أولاً');return;}}{common}svgToCanvas(b64,w,h,null).then(function(c){{dl(c,'webp',0.95,'{out_name}.webp');}}).catch(function(e){{alert(e);}});}})();'''
+        webp_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('ولّد أولاً');return;}}{common}svgToCanvas(b64,window.__cc_w,window.__cc_h,null).then(function(c){{dlFile(c,'webp',0.95,'{out_name}.webp');}}).catch(function(e){{alert('خطأ: '+e);}});}})();'''
 
-        svg_js = f'''(function(){{var b64=window.__cc_svg_b64;if(!b64){{alert('ولّد الصورة أولاً');return;}}var svgString=atob(b64);var blob=new Blob([svgString],{{type:'image/svg+xml;charset=utf-8'}});var url=URL.createObjectURL(blob);var a=document.createElement('a');a.href=url;a.download='{out_name}.svg';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){{URL.revokeObjectURL(url);}},1000);}})();'''
+        svg_js = f'''(function(){{var b64=window.__cc_b64;if(!b64){{alert('ولّد أولاً');return;}}var s=atob(b64);var blob=new Blob([s],{{type:'image/svg+xml;charset=utf-8'}});var u=URL.createObjectURL(blob);var a=document.createElement('a');a.href=u;a.download='{out_name}.svg';document.body.appendChild(a);a.click();document.body.removeChild(a);setTimeout(function(){{URL.revokeObjectURL(u);}},1000);}})();'''
 
         put_buttons(
             ['تحميل PNG', 'تحميل JPG', 'تحميل WebP', 'تحميل SVG', 'طباعة'],
@@ -654,8 +621,7 @@ def do_generate(**kwargs):
 
 
 def random_theme_then_regenerate(**kwargs):
-    themes = list(THEMES.keys())
-    kwargs['theme_name'] = random.choice(themes)
+    kwargs['theme_name'] = random.choice(list(THEMES.keys()))
     toast(f"تم اختيار: {kwargs['theme_name']}", color='success')
     do_generate(**kwargs)
 
