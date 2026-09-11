@@ -1,21 +1,105 @@
 # -*- coding: utf-8 -*-
 """
-🎨 مولد صور الأكواد v4.0 - الإصدار المتقدم
+CodeCanvas Pro v6.0 - محرر صور الأكواد الاحترافي
 Developed by Muhammed Alaa © 2026
 """
 from pywebio import start_server
-from pywebio.input import (
-    input, TEXT, textarea, select, radio, NUMBER, checkbox
-)
+from pywebio.input import input, TEXT, textarea, select, radio
 from pywebio.output import (
     put_html, put_markdown, put_buttons, put_grid,
-    put_info, put_warning, put_error, put_success,
+    put_info, put_warning, put_error,
     clear, toast, use_scope, put_collapse
 )
 from pywebio.session import set_env, run_js, go_app, local
 import base64
 import html as html_module
 import random
+from datetime import datetime
+
+# ═══════════════════════════════════════════════════════════
+#                    📋 معلومات التطبيق
+# ═══════════════════════════════════════════════════════════
+
+SITE_NAME = "CodeCanvas Pro — محرر صور الأكواد"
+SITE_DESC = "حوّل أكوادك إلى صور احترافية بـ 25 ثيماً و 15 لغة"
+SITE_VERSION = "6.0"
+AUTHOR = "Muhammed Alaa"
+COPYRIGHT = f"{AUTHOR} © 2026"
+
+SITE_ICON_SVG = '''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<defs>
+<linearGradient id="lg1" x1="0%" y1="0%" x2="100%" y2="100%">
+<stop offset="0%" stop-color="#667eea"/>
+<stop offset="100%" stop-color="#764ba2"/>
+</linearGradient>
+</defs>
+<rect x="4" y="4" width="56" height="56" rx="14" fill="url(#lg1)"/>
+<rect x="11" y="15" width="42" height="34" rx="4" fill="#ffffff" opacity="0.12"/>
+<rect x="11" y="15" width="42" height="9" rx="4" fill="#ffffff" opacity="0.22"/>
+<circle cx="15" cy="19.5" r="1.6" fill="#ff5f56"/>
+<circle cx="20" cy="19.5" r="1.6" fill="#ffbd2e"/>
+<circle cx="25" cy="19.5" r="1.6" fill="#27c93f"/>
+<path d="M 18 29 L 22 33 L 18 37" stroke="#00ff9f" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="27" y1="37" x2="36" y2="37" stroke="#00ff9f" stroke-width="2.5" stroke-linecap="round"/>
+<circle cx="44" cy="32" r="3.5" fill="#f92672"/>
+<circle cx="48" cy="27" r="2.5" fill="#e6db74"/>
+<circle cx="47" cy="39" r="2.5" fill="#66d9ef"/>
+</svg>'''
+
+SITE_ICON_URI = "data:image/svg+xml;base64," + base64.b64encode(SITE_ICON_SVG.encode('utf-8')).decode('ascii')
+
+
+# ═══════════════════════════════════════════════════════════
+#                    🎯 مكتبة الأيقونات
+# ═══════════════════════════════════════════════════════════
+
+ICONS = {
+    "code": '<path d="M 8 6 L 2 12 L 8 18 M 16 6 L 22 12 L 16 18" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    "text": '<path d="M 4 4 L 20 4 M 12 4 L 12 20 M 4 4 L 4 8 M 20 4 L 20 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
+    "palette": '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="8.5" cy="10" r="1.2" fill="currentColor"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="10" r="1.2" fill="currentColor"/><circle cx="13.5" cy="14.5" r="1.2" fill="currentColor"/>',
+    "settings": '<circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2" fill="none"/><path d="M 12 2 L 12 5 M 12 19 L 12 22 M 4.2 4.2 L 6.3 6.3 M 17.7 17.7 L 19.8 19.8 M 2 12 L 5 12 M 19 12 L 22 12 M 4.2 19.8 L 6.3 17.7 M 17.7 6.3 L 19.8 4.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    "download": '<path d="M 12 3 L 12 15 M 7 10 L 12 15 L 17 10 M 3 17 L 3 21 L 21 21 L 21 17" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    "image": '<rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="9" cy="9" r="2" fill="currentColor"/><path d="M 3 17 L 9 11 L 13 15 L 17 11 L 21 15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    "user": '<circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2" fill="none"/><path d="M 4 21 C 4 17 7 14 12 14 C 17 14 20 17 20 21" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
+    "calendar": '<rect x="3" y="5" width="18" height="16" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><line x1="3" y1="10" x2="21" y2="10" stroke="currentColor" stroke-width="2"/><line x1="8" y1="3" x2="8" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="16" y1="3" x2="16" y2="7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+    "tag": '<path d="M 3 12 L 12 3 L 21 3 L 21 12 L 12 21 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><circle cx="17" cy="7" r="1.5" fill="currentColor"/>',
+    "sparkle": '<path d="M 12 2 L 13.5 9.5 L 21 11 L 13.5 12.5 L 12 20 L 10.5 12.5 L 3 11 L 10.5 9.5 Z" fill="currentColor"/>',
+    "list": '<line x1="9" y1="6" x2="21" y2="6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="12" x2="21" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="18" x2="21" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="4" cy="6" r="1.5" fill="currentColor"/><circle cx="4" cy="12" r="1.5" fill="currentColor"/><circle cx="4" cy="18" r="1.5" fill="currentColor"/>',
+    "language": '<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" fill="none"/><path d="M 3 12 L 21 12 M 12 3 C 16 7 16 17 12 21 M 12 3 C 8 7 8 17 12 21" stroke="currentColor" stroke-width="2" fill="none"/>',
+    "brush": '<path d="M 20 3 L 12 11 L 8 7 L 20 3 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><path d="M 8 7 L 5 15 L 4 20 L 9 19 L 12 11" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
+    "star": '<polygon points="12,2 15,9 22,9.5 17,14.5 18.5,22 12,18 5.5,22 7,14.5 2,9.5 9,9" fill="currentColor"/>',
+    "glow": '<circle cx="12" cy="12" r="3" fill="currentColor"/><circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1.5" fill="none" opacity="0.5"/><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1" fill="none" opacity="0.25"/>',
+    "border": '<rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="2" fill="none" stroke-dasharray="4,3"/>',
+    "pencil": '<path d="M 3 21 L 4 16 L 16 4 L 20 8 L 8 20 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><line x1="14" y1="6" x2="18" y2="10" stroke="currentColor" stroke-width="2"/>',
+    "play": '<polygon points="6,4 20,12 6,20" fill="currentColor"/>',
+    "refresh": '<path d="M 20 12 A 8 8 0 1 1 12 4 M 12 4 L 16 8 M 12 4 L 16 0" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    "random": '<path d="M 16 4 L 21 8 L 16 12 M 21 8 L 3 8 M 8 12 L 3 16 L 8 20 M 3 16 L 21 16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    "file": '<path d="M 6 2 L 6 22 L 18 22 L 18 8 L 14 2 Z M 14 2 L 14 8 L 18 8" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
+    "printer": '<path d="M 6 9 L 6 3 L 18 3 L 18 9 M 6 18 L 3 18 L 3 9 L 21 9 L 21 18 L 18 18 M 6 14 L 18 14 L 18 22 L 6 22 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
+    "copy": '<rect x="9" y="9" width="12" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M 5 15 L 3 15 L 3 3 L 15 3 L 15 5" stroke="currentColor" stroke-width="2" fill="none"/>',
+    "info": '<circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" fill="none"/><line x1="12" y1="11" x2="12" y2="17" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7.5" r="1.2" fill="currentColor"/>',
+    "check": '<polyline points="4,12 10,18 20,6" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>',
+    "close": '<line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/>',
+    "eye": '<path d="M 2 12 C 5 6 9 4 12 4 C 15 4 19 6 22 12 C 19 18 15 20 12 20 C 9 20 5 18 2 12 Z" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="12" cy="12" r="3" fill="currentColor"/>',
+    "layers": '<polygon points="12,2 22,8 12,14 2,8" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><polyline points="2,16 12,22 22,16" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><polyline points="2,12 12,18 22,12" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
+    "rocket": '<path d="M 12 2 C 8 6 6 12 6 16 L 3 20 L 7 17 C 11 17 17 15 21 11 L 12 2 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><circle cx="14" cy="10" r="1.5" fill="currentColor"/><path d="M 6 16 L 3 15 L 5 13 M 8 18 L 9 21 L 11 19" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>',
+    "heart": '<path d="M 12 21 C 12 21 3 14 3 8.5 C 3 5.5 5.5 3 8.5 3 C 10.5 3 12 4.5 12 4.5 C 12 4.5 13.5 3 15.5 3 C 18.5 3 21 5.5 21 8.5 C 21 14 12 21 12 21 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/>',
+    "warning": '<path d="M 12 2 L 22 20 L 2 20 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/><line x1="12" y1="9" x2="12" y2="14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17" r="1" fill="currentColor"/>',
+    "window": '<rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" stroke-width="2"/><circle cx="6" cy="7" r="0.8" fill="currentColor"/><circle cx="9" cy="7" r="0.8" fill="currentColor"/><circle cx="12" cy="7" r="0.8" fill="currentColor"/>',
+}
+
+
+def icon(name, size=20, color="currentColor"):
+    """إرجاع أيقونة SVG"""
+    path = ICONS.get(name, ICONS["code"])
+    path = path.replace("currentColor", color)
+    return f'<svg xmlns="http://www.w3.org/2000/svg" width="{size}" height="{size}" viewBox="0 0 24 24" style="vertical-align:middle;display:inline-block;flex-shrink:0;">{path}</svg>'
+
+
+def icon_text(name, text, size=18, color="#667eea", gap=8):
+    """أيقونة + نص"""
+    return f'<span style="display:inline-flex;align-items:center;gap:{gap}px;vertical-align:middle;">{icon(name, size, color)}<span>{text}</span></span>'
+
 
 # ═══════════════════════════════════════════════════════════
 #                    🎨 الثيمات (25)
@@ -179,107 +263,42 @@ TEMPLATES = {
 # ═══════════════════════════════════════════════════════════
 
 LANGUAGES = {
-    "Python": {
-        "keywords": {'False','None','True','and','as','assert','async','await',
-            'break','class','continue','def','del','elif','else','except',
-            'finally','for','from','global','if','import','in','is',
-            'lambda','nonlocal','not','or','pass','raise','return','try',
-            'while','with','yield','self'},
-        "builtins": {'print','len','range','str','int','float','list','dict',
-            'set','tuple','bool','input','type','sum','max','min',
-            'sorted','enumerate','zip','map','filter','abs','round',
-            'all','any','open','isinstance'},
+    "Python": {"keywords": {'False','None','True','and','as','assert','async','await','break','class','continue','def','del','elif','else','except','finally','for','from','global','if','import','in','is','lambda','nonlocal','not','or','pass','raise','return','try','while','with','yield','self'},
+        "builtins": {'print','len','range','str','int','float','list','dict','set','tuple','bool','input','type','sum','max','min','sorted','enumerate','zip','map','filter','abs','round','all','any','open','isinstance'},
         "comment": "#", "strings": ['"', "'"], "filename": "main.py"},
-    "JavaScript": {
-        "keywords": {'var','let','const','function','return','if','else','for',
-            'while','do','switch','case','break','continue','new','this',
-            'class','extends','super','try','catch','finally','throw',
-            'typeof','instanceof','in','of','null','undefined','true',
-            'false','async','await','yield','import','export','from','default'},
-        "builtins": {'console','Math','JSON','Object','Array','String',
-            'Number','Boolean','Date','Promise','Map','Set'},
+    "JavaScript": {"keywords": {'var','let','const','function','return','if','else','for','while','do','switch','case','break','continue','new','this','class','extends','super','try','catch','finally','throw','typeof','instanceof','in','of','null','undefined','true','false','async','await','yield','import','export','from','default'},
+        "builtins": {'console','Math','JSON','Object','Array','String','Number','Boolean','Date','Promise','Map','Set'},
         "comment": "//", "strings": ['"', "'", '`'], "filename": "main.js"},
-    "TypeScript": {
-        "keywords": {'let','const','var','function','return','if','else','for',
-            'while','do','switch','case','break','continue','new','this',
-            'class','extends','super','interface','type','enum','implements',
-            'public','private','protected','readonly','abstract','as','is',
-            'null','undefined','true','false','async','await','import',
-            'export','from','default'},
-        "builtins": {'console','Math','JSON','Object','Array','String',
-            'Number','Boolean','Date','Promise','Map','Set'},
+    "TypeScript": {"keywords": {'let','const','var','function','return','if','else','for','while','do','switch','case','break','continue','new','this','class','extends','super','interface','type','enum','implements','public','private','protected','readonly','abstract','as','is','null','undefined','true','false','async','await','import','export','from','default'},
+        "builtins": {'console','Math','JSON','Object','Array','String','Number','Boolean','Date','Promise','Map','Set'},
         "comment": "//", "strings": ['"', "'", '`'], "filename": "main.ts"},
-    "HTML": {
-        "keywords": set(), "builtins": set(),
-        "comment": "<!--", "strings": ['"', "'"], "filename": "index.html"},
-    "CSS": {
-        "keywords": {'important','media','import','keyframes','font-face'},
-        "builtins": set(),
-        "comment": "/*", "strings": ['"', "'"], "filename": "style.css"},
-    "JSON": {
-        "keywords": {'true','false','null'}, "builtins": set(),
-        "comment": "//", "strings": ['"'], "filename": "data.json"},
-    "SQL": {
-        "keywords": {'SELECT','FROM','WHERE','INSERT','INTO','VALUES','UPDATE',
-            'SET','DELETE','CREATE','TABLE','DROP','ALTER','JOIN','LEFT',
-            'RIGHT','INNER','ON','GROUP','BY','ORDER','HAVING','LIMIT',
-            'AS','AND','OR','NOT','NULL','IS','IN','BETWEEN','LIKE','DISTINCT'},
-        "builtins": set(),
-        "comment": "--", "strings": ["'"], "filename": "query.sql"},
-    "Bash": {
-        "keywords": {'if','then','else','elif','fi','for','while','do','done',
-            'case','esac','function','return','break','continue','in',
-            'echo','export','source','read','local','exit','cd','pwd','ls'},
-        "builtins": {'echo','printf','read','cd','ls','pwd','mkdir','rm',
-            'cat','grep','sed','awk','find','chmod'},
+    "HTML": {"keywords": set(), "builtins": set(), "comment": "<!--", "strings": ['"', "'"], "filename": "index.html"},
+    "CSS": {"keywords": {'important','media','import','keyframes','font-face'}, "builtins": set(), "comment": "/*", "strings": ['"', "'"], "filename": "style.css"},
+    "JSON": {"keywords": {'true','false','null'}, "builtins": set(), "comment": "//", "strings": ['"'], "filename": "data.json"},
+    "SQL": {"keywords": {'SELECT','FROM','WHERE','INSERT','INTO','VALUES','UPDATE','SET','DELETE','CREATE','TABLE','DROP','ALTER','JOIN','LEFT','RIGHT','INNER','ON','GROUP','BY','ORDER','HAVING','LIMIT','AS','AND','OR','NOT','NULL','IS','IN','BETWEEN','LIKE','DISTINCT'},
+        "builtins": set(), "comment": "--", "strings": ["'"], "filename": "query.sql"},
+    "Bash": {"keywords": {'if','then','else','elif','fi','for','while','do','done','case','esac','function','return','break','continue','in','echo','export','source','read','local','exit','cd','pwd','ls'},
+        "builtins": {'echo','printf','read','cd','ls','pwd','mkdir','rm','cat','grep','sed','awk','find','chmod'},
         "comment": "#", "strings": ['"', "'"], "filename": "script.sh"},
-    "Java": {
-        "keywords": {'public','private','protected','class','interface','extends',
-            'implements','static','final','abstract','return','if','else',
-            'for','while','do','switch','case','break','continue','new',
-            'this','super','try','catch','finally','throw','throws','import',
-            'package','void','int','long','double','float','boolean','char',
-            'String','null','true','false','enum'},
+    "Java": {"keywords": {'public','private','protected','class','interface','extends','implements','static','final','abstract','return','if','else','for','while','do','switch','case','break','continue','new','this','super','try','catch','finally','throw','throws','import','package','void','int','long','double','float','boolean','char','String','null','true','false','enum'},
         "builtins": {'System','String','Integer','Double','Math','Object'},
         "comment": "//", "strings": ['"', "'"], "filename": "Main.java"},
-    "C++": {
-        "keywords": {'int','char','double','float','bool','void','long','short',
-            'unsigned','signed','const','static','extern','inline','virtual',
-            'class','struct','union','enum','namespace','using','public',
-            'private','protected','return','if','else','for','while','do',
-            'switch','case','break','continue','new','delete','this',
-            'try','catch','throw','template','auto','nullptr','true','false'},
+    "C++": {"keywords": {'int','char','double','float','bool','void','long','short','unsigned','signed','const','static','extern','inline','virtual','class','struct','union','enum','namespace','using','public','private','protected','return','if','else','for','while','do','switch','case','break','continue','new','delete','this','try','catch','throw','template','auto','nullptr','true','false'},
         "builtins": {'cout','cin','endl','std','string','vector','map','set'},
         "comment": "//", "strings": ['"', "'"], "filename": "main.cpp"},
-    "PHP": {
-        "keywords": {'function','class','interface','extends','implements',
-            'public','private','protected','static','const','var','return',
-            'if','else','elseif','for','foreach','while','do','switch',
-            'case','break','continue','new','this','try','catch','finally',
-            'throw','use','namespace','echo','print','true','false','null'},
+    "PHP": {"keywords": {'function','class','interface','extends','implements','public','private','protected','static','const','var','return','if','else','elseif','for','foreach','while','do','switch','case','break','continue','new','this','try','catch','finally','throw','use','namespace','echo','print','true','false','null'},
         "builtins": {'echo','print','array','count','strlen','substr'},
         "comment": "//", "strings": ['"', "'"], "filename": "index.php"},
-    "Go": {
-        "keywords": {'package','import','func','var','const','type','struct',
-            'interface','map','chan','go','defer','return','if','else',
-            'for','switch','case','break','continue','range','true','false','nil'},
+    "Go": {"keywords": {'package','import','func','var','const','type','struct','interface','map','chan','go','defer','return','if','else','for','switch','case','break','continue','range','true','false','nil'},
         "builtins": {'println','printf','make','new','len','cap','append'},
         "comment": "//", "strings": ['"', '`'], "filename": "main.go"},
-    "Rust": {
-        "keywords": {'fn','let','mut','const','static','struct','enum','trait',
-            'impl','pub','use','mod','crate','self','super','return','if',
-            'else','match','for','while','loop','break','continue','in','as'},
+    "Rust": {"keywords": {'fn','let','mut','const','static','struct','enum','trait','impl','pub','use','mod','crate','self','super','return','if','else','match','for','while','loop','break','continue','in','as'},
         "builtins": {'println','print','vec','String','Box','Option','Result'},
         "comment": "//", "strings": ['"'], "filename": "main.rs"},
-    "Ruby": {
-        "keywords": {'def','end','class','module','if','elsif','else','unless',
-            'while','until','for','do','case','when','then','begin','rescue',
-            'ensure','return','yield','break','next','self','nil','true','false'},
+    "Ruby": {"keywords": {'def','end','class','module','if','elsif','else','unless','while','until','for','do','case','when','then','begin','rescue','ensure','return','yield','break','next','self','nil','true','false'},
         "builtins": {'puts','print','p','gets','require'},
         "comment": "#", "strings": ['"', "'"], "filename": "main.rb"},
-    "YAML": {
-        "keywords": {'true','false','null','yes','no'}, "builtins": set(),
-        "comment": "#", "strings": ['"', "'"], "filename": "config.yaml"},
+    "YAML": {"keywords": {'true','false','null','yes','no'}, "builtins": set(), "comment": "#", "strings": ['"', "'"], "filename": "config.yaml"},
 }
 
 
@@ -291,7 +310,7 @@ def esc(t):
     return html_module.escape(t)
 
 
-def find_comment(line, comment_char, quote_chars):
+def find_comment(line, cc, quotes):
     in_str = None
     i = 0
     while i < len(line):
@@ -303,9 +322,9 @@ def find_comment(line, comment_char, quote_chars):
             if ch == in_str:
                 in_str = None
         else:
-            if ch in quote_chars:
+            if ch in quotes:
                 in_str = ch
-            elif line[i:i+len(comment_char)] == comment_char:
+            elif line[i:i+len(cc)] == cc:
                 return i
         i += 1
     return -1
@@ -315,18 +334,17 @@ def highlight_code_part(line, theme, lang):
     result = ""
     i = 0
     n = len(line)
-    keywords = lang["keywords"]
-    builtins = lang["builtins"]
+    kws = lang["keywords"]
+    bis = lang["builtins"]
     quotes = lang["strings"]
 
     while i < n:
         ch = line[i]
-
         if ch in quotes:
-            quote = ch
+            q = ch
             j = i + 1
             while j < n:
-                if line[j] == quote and line[j-1] != '\\':
+                if line[j] == q and line[j-1] != '\\':
                     break
                 j += 1
             if j < n:
@@ -348,12 +366,10 @@ def highlight_code_part(line, theme, lang):
             while j < n and (line[j].isalnum() or line[j] == '_'):
                 j += 1
             word = line[i:j]
-            wl = word.lower()
-            wu = word.upper()
-
-            if word in keywords or wl in keywords or wu in keywords:
+            wl, wu = word.lower(), word.upper()
+            if word in kws or wl in kws or wu in kws:
                 result += f'<tspan fill="{theme["keyword"]}" font-weight="bold">{esc(word)}</tspan>'
-            elif word in builtins:
+            elif word in bis:
                 result += f'<tspan fill="{theme["function"]}">{esc(word)}</tspan>'
             elif j < n and line[j] == '(':
                 result += f'<tspan fill="{theme["function"]}">{esc(word)}</tspan>'
@@ -374,51 +390,44 @@ def highlight_code_part(line, theme, lang):
 
         result += esc(ch)
         i += 1
-
     return result
 
 
 def highlight_line(line, theme, lang):
     if not line.strip():
         return ""
-
-    comment_char = lang["comment"]
-    idx = find_comment(line, comment_char, lang["strings"])
+    idx = find_comment(line, lang["comment"], lang["strings"])
     if idx != -1:
         return highlight_code_part(line[:idx], theme, lang) + \
                f'<tspan fill="{theme["comment"]}" font-style="italic">{esc(line[idx:])}</tspan>'
-
     return highlight_code_part(line, theme, lang)
 
 
 # ═══════════════════════════════════════════════════════════
-#                    🖼️ توليد SVG المتقدم
+#                    🖼️ توليد SVG
 # ═══════════════════════════════════════════════════════════
 
-def wrap_text(text, max_chars_per_line):
-    """تقسيم النص الطويل إلى أسطر"""
+def wrap_text(text, max_chars):
     words = text.split()
     lines = []
-    current = ""
-    for word in words:
-        if len(current) + len(word) + 1 <= max_chars_per_line:
-            current += (" " if current else "") + word
+    cur = ""
+    for w in words:
+        if len(cur) + len(w) + 1 <= max_chars:
+            cur += (" " if cur else "") + w
         else:
-            if current:
-                lines.append(current)
-            current = word
-    if current:
-        lines.append(current)
+            if cur:
+                lines.append(cur)
+            cur = w
+    if cur:
+        lines.append(cur)
     return lines
 
 
 def generate_svg(code, theme_name, lang_name, bg_name, template_name,
                 watermark, show_numbers, filename,
                 title="", description="", author="", version="",
-                show_date=False, show_header=True, show_glow=False,
-                show_border=False, border_color=""):
-    """توليد SVG متقدم"""
-
+                show_date=False, show_glow=False, show_border=False,
+                border_color=""):
     theme = THEMES.get(theme_name, THEMES["Monokai"])
     lang = LANGUAGES.get(lang_name, LANGUAGES["Python"])
     tpl = TEMPLATES.get(template_name, TEMPLATES["افتراضي"])
@@ -434,18 +443,15 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
     header_h = 45 if tpl["show_window"] else 0
     pad = tpl["padding"]
 
-    # ═══ حساب الأبعاد ═══
     code_w = int(max_len * char_w) + pad * 2 + 80
     code_h = num_lines * line_h + pad * 2 + header_h
 
-    # عنوان + وصف أعلى
     title_h = 0
     if title.strip():
         title_h += 50
     if author.strip() or version.strip() or show_date:
         title_h += 30
 
-    # وصف أسفل
     desc_h = 0
     desc_lines = []
     if description.strip():
@@ -457,159 +463,97 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
     W = max(code_w + outer_pad * 2, 500)
     H = code_h + outer_pad * 2 + title_h + desc_h
 
-    # ═══ الخلفية ═══
     bg_defs = ""
     bg_fill = theme["bg"]
 
     if bg["type"] == "solid":
         bg_fill = bg["color"]
     elif bg["type"] == "linear":
-        bg_defs = f'''<linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="{bg["c1"]}"/>
-            <stop offset="100%" stop-color="{bg["c2"]}"/>
-        </linearGradient>'''
+        bg_defs = f'<linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="{bg["c1"]}"/><stop offset="100%" stop-color="{bg["c2"]}"/></linearGradient>'
         bg_fill = "url(#bgGrad)"
     elif bg["type"] == "pattern":
-        pattern = bg["pattern"]
-        if pattern == "dots":
+        p = bg["pattern"]
+        if p == "dots":
             bg_defs = f'<pattern id="bgPat" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1.5" fill="{theme["accent"]}" opacity="0.15"/></pattern>'
-        elif pattern == "grid":
+        elif p == "grid":
             bg_defs = f'<pattern id="bgPat" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="{theme["accent"]}" stroke-width="1" opacity="0.15"/></pattern>'
-        elif pattern == "lines":
+        elif p == "lines":
             bg_defs = f'<pattern id="bgPat" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><line x1="0" y1="0" x2="20" y2="20" stroke="{theme["accent"]}" stroke-width="1" opacity="0.15"/></pattern>'
 
-    # ═══ SVG ═══
     parts = []
-    parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" font-family="Consolas,Monaco,monospace">')
+    parts.append(f'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="{W}" height="{H}" viewBox="0 0 {W} {H}" font-family="Consolas,Monaco,monospace">')
     parts.append('<defs>')
     parts.append(bg_defs)
-
-    # توهج
     if show_glow:
-        parts.append(f'<filter id="glow" x="-50%" y="-50%" width="200%" height="200%">')
-        parts.append(f'<feGaussianBlur stdDeviation="8" result="coloredBlur"/>')
-        parts.append(f'<feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>')
-        parts.append('</filter>')
-
-    # ظل
-    parts.append('<filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">')
-    parts.append('<feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.4"/>')
-    parts.append('</filter>')
-
+        parts.append('<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>')
+    parts.append('<filter id="shadow" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000" flood-opacity="0.4"/></filter>')
     parts.append('</defs>')
 
-    # خلفية
     parts.append(f'<rect width="{W}" height="{H}" fill="{bg_fill}"/>')
     if bg["type"] == "pattern":
         parts.append(f'<rect width="{W}" height="{H}" fill="url(#bgPat)"/>')
 
-    # ═══ العنوان أعلى ═══
-    y_offset = outer_pad
+    y_off = outer_pad
     if title.strip():
-        parts.append(f'<text x="{W // 2}" y="{y_offset + 30}" text-anchor="middle" '
-                    f'fill="{theme["text"]}" font-size="22" font-weight="bold" '
-                    f'font-family="Arial,sans-serif">{esc(title)}</text>')
-        y_offset += 50
+        parts.append(f'<text x="{W // 2}" y="{y_off + 30}" text-anchor="middle" fill="{theme["text"]}" font-size="22" font-weight="bold" font-family="Arial,sans-serif">{esc(title)}</text>')
+        y_off += 50
 
     if author.strip() or version.strip() or show_date:
-        meta_parts = []
+        meta = []
         if author.strip():
-            meta_parts.append(f"👤 {author}")
+            meta.append(author)
         if version.strip():
-            meta_parts.append(f"v{version}")
+            meta.append(f"v{version}")
         if show_date:
-            from datetime import datetime
-            meta_parts.append(f"📅 {datetime.now().strftime('%Y-%m-%d')}")
-        meta_text = " • ".join(meta_parts)
-        parts.append(f'<text x="{W // 2}" y="{y_offset + 18}" text-anchor="middle" '
-                    f'fill="{theme["accent"]}" font-size="13" '
-                    f'font-family="Arial,sans-serif" opacity="0.9">{esc(meta_text)}</text>')
-        y_offset += 30
+            meta.append(datetime.now().strftime('%Y-%m-%d'))
+        parts.append(f'<text x="{W // 2}" y="{y_off + 18}" text-anchor="middle" fill="{theme["accent"]}" font-size="13" font-family="Arial,sans-serif" opacity="0.9">{esc(" • ".join(meta))}</text>')
+        y_off += 30
 
-    # ═══ بطاقة الكود ═══
-    cx = outer_pad
-    cy = y_offset
-    cw = W - outer_pad * 2
-    ch = code_h
+    cx, cy = outer_pad, y_off
+    cw, ch = W - outer_pad * 2, code_h
     radius = tpl["radius"]
 
-    # حدود
     if show_border:
-        border = border_color if border_color else theme["accent"]
-        parts.append(f'<rect x="{cx - 3}" y="{cy - 3}" width="{cw + 6}" height="{ch + 6}" '
-                    f'rx="{radius + 3}" fill="none" stroke="{border}" stroke-width="3" '
-                    + ('filter="url(#glow)"' if show_glow else '') + '/>')
+        bc = border_color if border_color else theme["accent"]
+        parts.append(f'<rect x="{cx - 3}" y="{cy - 3}" width="{cw + 6}" height="{ch + 6}" rx="{radius + 3}" fill="none" stroke="{bc}" stroke-width="3"' + (' filter="url(#glow)"' if show_glow else '') + '/>')
 
-    # ظل البطاقة
-    parts.append(f'<rect x="{cx}" y="{cy}" width="{cw}" height="{ch}" rx="{radius}" '
-                f'fill="{theme["bg"]}" filter="url(#shadow)"/>')
+    parts.append(f'<rect x="{cx}" y="{cy}" width="{cw}" height="{ch}" rx="{radius}" fill="{theme["bg"]}" filter="url(#shadow)"/>')
 
-    # ═══ شريط العنوان ═══
     if tpl["show_window"]:
-        header_bg = theme["window_bg"]
-        parts.append(f'<path d="M {cx} {cy + radius} Q {cx} {cy} {cx + radius} {cy} L {cx + cw - radius} {cy} Q {cx + cw} {cy} {cx + cw} {cy + radius} L {cx + cw} {cy + header_h} L {cx} {cy + header_h} Z" fill="{header_bg}"/>')
-        parts.append(f'<line x1="{cx}" y1="{cy + header_h}" x2="{cx + cw}" y2="{cy + header_h}" '
-                    f'stroke="{theme["comment"]}" stroke-width="1" opacity="0.3"/>')
-
-        # دوائر Mac
+        parts.append(f'<path d="M {cx} {cy + radius} Q {cx} {cy} {cx + radius} {cy} L {cx + cw - radius} {cy} Q {cx + cw} {cy} {cx + cw} {cy + radius} L {cx + cw} {cy + header_h} L {cx} {cy + header_h} Z" fill="{theme["window_bg"]}"/>')
+        parts.append(f'<line x1="{cx}" y1="{cy + header_h}" x2="{cx + cw}" y2="{cy + header_h}" stroke="{theme["comment"]}" stroke-width="1" opacity="0.3"/>')
         hcy = cy + header_h // 2
         parts.append(f'<circle cx="{cx + 20}" cy="{hcy}" r="6" fill="#ff5f56"/>')
         parts.append(f'<circle cx="{cx + 42}" cy="{hcy}" r="6" fill="#ffbd2e"/>')
         parts.append(f'<circle cx="{cx + 64}" cy="{hcy}" r="6" fill="#27c93f"/>')
+        dfn = filename.strip() if filename.strip() else lang.get("filename", "code.txt")
+        parts.append(f'<text x="{W // 2}" y="{hcy + 5}" text-anchor="middle" fill="{theme["text"]}" font-size="13" opacity="0.75">{esc(dfn)}</text>')
+        parts.append(f'<text x="{cx + cw - 20}" y="{hcy + 5}" text-anchor="end" fill="{theme["accent"]}" font-size="12" font-weight="bold" opacity="0.9">{esc(lang_name)}</text>')
 
-        # اسم الملف
-        display_fn = filename.strip() if filename.strip() else lang.get("filename", "code.txt")
-        parts.append(f'<text x="{W // 2}" y="{hcy + 5}" text-anchor="middle" '
-                    f'fill="{theme["text"]}" font-size="13" opacity="0.75">{esc(display_fn)}</text>')
-
-        # اسم اللغة
-        parts.append(f'<text x="{cx + cw - 20}" y="{hcy + 5}" text-anchor="end" '
-                    f'fill="{theme["accent"]}" font-size="12" font-weight="bold" '
-                    f'opacity="0.9">{esc(lang_name)}</text>')
-
-    # ═══ الكود ═══
     y_start = cy + header_h + pad + font
     for idx, line in enumerate(lines):
         y_pos = y_start + idx * line_h
         if y_pos > cy + ch - pad // 2:
             break
-
         if show_numbers:
-            parts.append(f'<text x="{cx + pad + 30}" y="{y_pos}" text-anchor="end" '
-                        f'fill="{theme["comment"]}" font-size="{font}" opacity="0.5">{idx + 1}</text>')
+            parts.append(f'<text x="{cx + pad + 30}" y="{y_pos}" text-anchor="end" fill="{theme["comment"]}" font-size="{font}" opacity="0.5">{idx + 1}</text>')
             tx = cx + pad + 50
         else:
             tx = cx + pad + 10
-
         hl = highlight_line(line, theme, lang)
         if hl:
-            parts.append(f'<text x="{tx}" y="{y_pos}" font-size="{font}" '
-                        f'fill="{theme["text"]}" xml:space="preserve">{hl}</text>')
+            parts.append(f'<text x="{tx}" y="{y_pos}" font-size="{font}" fill="{theme["text"]}" xml:space="preserve">{hl}</text>')
 
-    # ═══ الوصف تحت الصورة ═══
     if description.strip():
         dy = cy + ch + 30
-        # خلفية الوصف
-        desc_box_h = len(desc_lines) * (font + 6) + 40
-        parts.append(f'<rect x="{cx}" y="{dy - 10}" width="{cw}" height="{desc_box_h}" '
-                    f'rx="8" fill="{theme["window_bg"]}" opacity="0.9"/>')
+        box_h = len(desc_lines) * (font + 6) + 40
+        parts.append(f'<rect x="{cx}" y="{dy - 10}" width="{cw}" height="{box_h}" rx="8" fill="{theme["window_bg"]}" opacity="0.9"/>')
+        parts.append(f'<rect x="{cx}" y="{dy - 10}" width="4" height="{box_h}" rx="2" fill="{theme["accent"]}"/>')
+        for i, dl in enumerate(desc_lines):
+            parts.append(f'<text x="{cx + 25}" y="{dy + 15 + i * (font + 6)}" fill="{theme["text"]}" font-size="{font}" font-family="Arial,sans-serif" xml:space="preserve">{esc(dl)}</text>')
 
-        # ايقونة
-        parts.append(f'<text x="{cx + 20}" y="{dy + 15}" fill="{theme["accent"]}" '
-                    f'font-size="16" font-family="Arial">📝</text>')
-
-        # نص الوصف
-        for i, dline in enumerate(desc_lines):
-            ly = dy + 15 + i * (font + 6)
-            parts.append(f'<text x="{cx + 45}" y="{ly}" fill="{theme["text"]}" '
-                        f'font-size="{font}" font-family="Arial,sans-serif" '
-                        f'xml:space="preserve">{esc(dline)}</text>')
-
-    # ═══ علامة مائية ═══
     if watermark.strip():
-        parts.append(f'<text x="{W - 25}" y="{H - 15}" text-anchor="end" '
-                    f'fill="{theme["text"]}" font-size="12" opacity="0.5" '
-                    f'font-style="italic">{esc(watermark)}</text>')
+        parts.append(f'<text x="{W - 25}" y="{H - 15}" text-anchor="end" fill="{theme["text"]}" font-size="12" opacity="0.5" font-style="italic">{esc(watermark)}</text>')
 
     parts.append('</svg>')
     return ''.join(parts), W, H
@@ -620,28 +564,97 @@ def generate_svg(code, theme_name, lang_name, bg_name, template_name,
 # ═══════════════════════════════════════════════════════════
 
 def setup_site():
-    set_env(title="🎨 مولد صور الأكواد", auto_scroll_bottom=True)
-    run_js('''var o=document.querySelector("link[rel*='icon']");if(o)o.remove();
-    var i=document.createElement('link');i.rel='shortcut icon';
-    i.href='https://cdn-icons-png.flaticon.com/512/1159/1159641.png';
-    document.head.appendChild(i);''')
+    set_env(title=SITE_NAME, description=SITE_DESC, auto_scroll_bottom=True)
+    run_js(f'''
+    (function() {{
+        var old = document.querySelector("link[rel*='icon']");
+        if (old) old.remove();
+        var i = document.createElement('link');
+        i.rel = 'icon';
+        i.type = 'image/svg+xml';
+        i.href = '{SITE_ICON_URI}';
+        document.head.appendChild(i);
+
+        var apple = document.createElement('link');
+        apple.rel = 'apple-touch-icon';
+        apple.href = '{SITE_ICON_URI}';
+        document.head.appendChild(apple);
+
+        var meta = document.createElement('meta');
+        meta.name = 'theme-color';
+        meta.content = '#667eea';
+        document.head.appendChild(meta);
+    }})();
+    ''')
 
 
 def render_header():
-    put_html('''<div style="background:linear-gradient(135deg,#667eea,#764ba2);
-        padding:25px;border-radius:15px;margin-bottom:20px;text-align:center;
-        box-shadow:0 10px 30px rgba(0,0,0,0.2);color:white;">
-    <h1 style="color:white;margin:0;font-size:30px;">🎨 مولد صور الأكواد v4.0</h1>
-    <p style="margin:10px 0 0 0;opacity:0.95;font-size:14px;">
-        25 ثيماً • 15 لغة • 10 قوالب • 22 خلفية • شرح مرفق</p>
+    put_html(f'''<div style="background:linear-gradient(135deg,#667eea,#764ba2);
+        padding:25px 30px;border-radius:16px;margin-bottom:24px;
+        box-shadow:0 12px 32px rgba(102,126,234,0.3);color:white;">
+        <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+            <div style="background:rgba(255,255,255,0.18);border-radius:16px;
+                padding:10px;display:flex;align-items:center;justify-content:center;
+                backdrop-filter: blur(10px);">
+                <div style="width:56px;height:56px;">{SITE_ICON_SVG}</div>
+            </div>
+            <div style="flex:1;min-width:200px;">
+                <h1 style="color:white;margin:0;font-size:27px;font-weight:800;
+                    letter-spacing:-0.5px;">CodeCanvas Pro</h1>
+                <p style="margin:6px 0 0 0;opacity:0.95;font-size:14px;">
+                    محرر صور الأكواد الاحترافي</p>
+            </div>
+            <div style="text-align:right;">
+                <div style="background:rgba(255,255,255,0.18);padding:7px 16px;
+                    border-radius:22px;display:inline-block;font-size:12px;
+                    font-weight:600;backdrop-filter: blur(10px);">
+                    v{SITE_VERSION}</div>
+            </div>
+        </div>
+        <div style="margin-top:20px;display:flex;gap:20px;flex-wrap:wrap;
+            font-size:13px;opacity:0.95;">
+            <span style="display:inline-flex;align-items:center;gap:7px;">
+                {icon("palette", 17, "white")} 25 ثيماً</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;">
+                {icon("code", 17, "white")} 15 لغة</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;">
+                {icon("image", 17, "white")} 10 قوالب</span>
+            <span style="display:inline-flex;align-items:center;gap:7px;">
+                {icon("brush", 17, "white")} 22 خلفية</span>
+        </div>
     </div>''')
 
 
 def render_footer():
-    put_html('''<div style="text-align:center;padding:20px;margin-top:25px;
-                color:#888;border-top:1px solid #e0e0e0;font-size:12px;">
-    🎨 مولد صور الأكواد v4.0 |
-    Developed by <b style="color:#667eea;">Muhammed Alaa © 2026</b>
+    put_html(f'''<div style="text-align:center;padding:28px 20px;margin-top:32px;
+        color:#888;border-top:1px solid #e0e0e0;font-size:13px;
+        background:#fafafa;border-radius:12px;">
+        <div style="display:inline-flex;align-items:center;gap:10px;
+            justify-content:center;flex-wrap:wrap;margin-bottom:8px;">
+            <span style="width:22px;height:22px;display:inline-block;
+                vertical-align:middle;">{SITE_ICON_SVG}</span>
+            <b style="color:#2c3e50;">CodeCanvas Pro</b>
+            <span style="color:#bbb;">•</span>
+            <span>v{SITE_VERSION}</span>
+        </div>
+        <div style="font-size:12px;opacity:0.85;">
+            Developed with {icon("heart", 13, "#e74c3c")} by
+            <b style="color:#667eea;">{COPYRIGHT}</b>
+        </div>
+    </div>''')
+
+
+def section_title(icon_name, text, color="#667eea", subtitle=""):
+    sub = f'<span style="font-size:13px;color:#888;font-weight:400;margin-right:10px;">{subtitle}</span>' if subtitle else ''
+    put_html(f'''<div style="display:flex;align-items:center;gap:12px;
+        margin:26px 0 14px 0;padding-bottom:10px;
+        border-bottom:2px solid {color}22;">
+        <div style="background:{color}15;padding:8px;border-radius:10px;
+            display:flex;align-items:center;justify-content:center;">
+            <span style="color:{color};display:inline-flex;">{icon(icon_name, 20, color)}</span>
+        </div>
+        <span style="font-size:19px;font-weight:700;color:#2c3e50;">{text}</span>
+        {sub}
     </div>''')
 
 
@@ -654,8 +667,7 @@ def main():
     clear()
     render_header()
 
-    # ═══ 1. الكود ═══
-    put_markdown("## 1️⃣ الكود")
+    section_title("code", "الكود", "#667eea", "الصق أو اكتب كودك هنا")
     code = textarea(
         "الكود:",
         value='''def greet(name):
@@ -667,88 +679,70 @@ greet("أحمد")''',
         placeholder="الصق كودك هنا..."
     )
 
-    # ═══ 2. الوصف ═══
-    put_markdown("## 2️⃣ الشرح والوصف")
-    title = input("🏷️ عنوان (اختياري):", type=TEXT, value="",
+    section_title("pencil", "الشرح والوصف", "#4CAF50", "اختياري")
+    title = input("عنوان الصورة:", type=TEXT, value="",
                  required=False, placeholder="مثال: دالة الترحيب")
     description = textarea(
-        "📝 شرح الكود (يظهر تحت الصورة):",
-        rows=3,
-        value="",
-        placeholder="اكتب شرحاً لوظيفة الكود... مثال: هذه الدالة تستقبل اسم المستخدم وتطبع رسالة ترحيب"
+        "شرح الكود (يظهر تحت الصورة):",
+        rows=3, value="",
+        placeholder="اكتب شرحاً لوظيفة الكود..."
     )
 
-    # ═══ 3. معلومات إضافية ═══
-    with put_collapse("ℹ️ معلومات إضافية (اختياري)"):
-        author = input("👤 المؤلف:", type=TEXT, value="",
+    with put_collapse("معلومات إضافية (اختياري)"):
+        author = input("المؤلف:", type=TEXT, value="",
                       required=False, placeholder="اسمك")
-        version = input("🔢 الإصدار:", type=TEXT, value="",
+        version = input("الإصدار:", type=TEXT, value="",
                        required=False, placeholder="1.0")
-        show_date = radio("📅 إظهار التاريخ:",
-                        options=["لا", "نعم"],
-                        value="لا", required=True, inline=True)
+        show_date = radio("إظهار التاريخ:",
+                        options=["لا", "نعم"], value="لا",
+                        required=True, inline=True)
 
-    # ═══ 4. التصميم ═══
-    put_markdown("## 3️⃣ التصميم")
-
-    lang_name = select("💻 اللغة:",
+    section_title("palette", "التصميم", "#9C27B0")
+    lang_name = select("اللغة:",
                       options=list(LANGUAGES.keys()),
                       value="Python", required=True)
-    theme_name = select("🎨 الثيم:",
+    theme_name = select("الثيم:",
                        options=list(THEMES.keys()),
                        value="Monokai", required=True)
-    bg_name = select("🌈 الخلفية:",
+    bg_name = select("الخلفية:",
                     options=list(BACKGROUNDS.keys()),
                     value="بدون (لون الثيم)", required=True)
-    template_name = select("📐 القالب:",
+    template_name = select("القالب:",
                           options=list(TEMPLATES.keys()),
                           value="افتراضي", required=True)
 
-    # ═══ 5. تأثيرات بصرية ═══
-    with put_collapse("✨ تأثيرات بصرية متقدمة (اختياري)"):
-        show_glow = radio("🌟 توهج حول البطاقة:",
-                        options=["لا", "نعم"],
-                        value="لا", required=True, inline=True)
-        show_border = radio("🔲 إطار ملون:",
-                          options=["لا", "نعم"],
-                          value="لا", required=True, inline=True)
-        border_color = input("🎨 لون الإطار (hex):",
+    with put_collapse("تأثيرات بصرية متقدمة (اختياري)"):
+        show_glow = radio("توهج حول البطاقة:",
+                        options=["لا", "نعم"], value="لا",
+                        required=True, inline=True)
+        show_border = radio("إطار ملون:",
+                          options=["لا", "نعم"], value="لا",
+                          required=True, inline=True)
+        border_color = input("لون الإطار (hex):",
                            type=TEXT, value="#667eea",
                            required=False, placeholder="#667eea")
 
-    # ═══ 6. تفاصيل ═══
-    put_markdown("## 4️⃣ تفاصيل إضافية")
-
-    filename = input("📄 اسم الملف:",
+    section_title("list", "تفاصيل إضافية", "#FF9800")
+    filename = input("اسم الملف:",
                     type=TEXT, value="",
                     required=False, placeholder="مثال: app.py")
-    watermark = input("💧 علامة مائية:",
+    watermark = input("علامة مائية:",
                      type=TEXT, value="",
                      required=False, placeholder="مثال: @username")
-    show_numbers = radio("🔢 أرقام الأسطر:",
-                        options=["نعم", "لا"],
-                        value="نعم", required=True, inline=True)
+    show_numbers = radio("أرقام الأسطر:",
+                        options=["نعم", "لا"], value="نعم",
+                        required=True, inline=True)
 
-    # ═══ توليد ═══
-    put_markdown("---")
+    put_html('<div style="height:24px;"></div>')
     put_buttons(
-        ['🎨 توليد الصورة'],
+        ['توليد الصورة'],
         onclick=[lambda: do_generate(
-            code=code,
-            theme_name=theme_name,
-            lang_name=lang_name,
-            bg_name=bg_name,
-            template_name=template_name,
-            watermark=watermark,
-            show_numbers=(show_numbers == "نعم"),
-            filename=filename,
-            title=title,
-            description=description,
-            author=author,
-            version=version,
-            show_date=(show_date == "نعم"),
-            show_glow=(show_glow == "نعم"),
-            show_border=(show_border == "نعم"),
+            code=code, theme_name=theme_name, lang_name=lang_name,
+            bg_name=bg_name, template_name=template_name,
+            watermark=watermark, show_numbers=(show_numbers == "نعم"),
+            filename=filename, title=title, description=description,
+            author=author, version=version, show_date=(show_date == "نعم"),
+            show_glow=(show_glow == "نعم"), show_border=(show_border == "نعم"),
             border_color=border_color,
         )]
     )
@@ -758,42 +752,36 @@ greet("أحمد")''',
 
 
 def do_generate(**kwargs):
-    """توليد الصورة"""
-    code = kwargs['code']
-
-    if not code.strip():
-        toast("⚠️ الرجاء إدخال كود!", color='warning')
+    if not kwargs['code'].strip():
+        toast("الرجاء إدخال كود!", color='warning')
         return
 
     clear('preview')
     with use_scope('preview'):
-        put_markdown("---")
-        put_markdown("## 🖼️ النتيجة")
+        put_html('<div style="height:20px;"></div>')
+        section_title("image", "النتيجة", "#4CAF50", "معاينة مباشرة")
 
         try:
             svg_str, w, h = generate_svg(
-                code=kwargs['code'],
-                theme_name=kwargs['theme_name'],
-                lang_name=kwargs['lang_name'],
-                bg_name=kwargs['bg_name'],
+                code=kwargs['code'], theme_name=kwargs['theme_name'],
+                lang_name=kwargs['lang_name'], bg_name=kwargs['bg_name'],
                 template_name=kwargs['template_name'],
                 watermark=kwargs['watermark'],
                 show_numbers=kwargs['show_numbers'],
-                filename=kwargs['filename'],
-                title=kwargs['title'],
-                description=kwargs['description'],
-                author=kwargs['author'],
-                version=kwargs['version'],
-                show_date=kwargs['show_date'],
+                filename=kwargs['filename'], title=kwargs['title'],
+                description=kwargs['description'], author=kwargs['author'],
+                version=kwargs['version'], show_date=kwargs['show_date'],
                 show_glow=kwargs['show_glow'],
                 show_border=kwargs['show_border'],
                 border_color=kwargs['border_color'],
             )
         except Exception as e:
-            put_error(f"❌ خطأ في التوليد: {e}")
+            put_error(f"خطأ في التوليد: {e}")
             return
 
-        # عرض
+        # حفظ SVG كـ base64 في متغير JS
+        svg_b64 = base64.b64encode(svg_str.encode('utf-8')).decode('ascii')
+
         put_html(f'''
         <div style="background:#e8e8e8;padding:20px;border-radius:12px;
             text-align:center;margin:15px 0;overflow:auto;">
@@ -803,174 +791,186 @@ def do_generate(**kwargs):
                 {svg_str}
             </div>
         </div>
+        <script>
+            window.__codecanvas_svg = atob("{svg_b64}");
+            window.__codecanvas_w = {w};
+            window.__codecanvas_h = {h};
+        </script>
         ''')
 
-        info_parts = [f"📐 {w}×{h} px",
-                     f"🎨 {kwargs['theme_name']}",
-                     f"💻 {kwargs['lang_name']}"]
+        info_items = [f"{w}×{h} px", kwargs['theme_name'], kwargs['lang_name']]
         if kwargs['title'].strip():
-            info_parts.append(f"🏷️ {kwargs['title']}")
+            info_items.append(kwargs['title'])
         if kwargs['description'].strip():
-            info_parts.append("📝 يوجد شرح")
-        if kwargs['show_glow']:
-            info_parts.append("🌟 توهج")
-        if kwargs['show_border']:
-            info_parts.append("🔲 إطار")
+            info_items.append("مع شرح")
+        put_info(" | ".join(info_items))
 
-        put_info(" | ".join(info_parts))
-
-        # ═══ التحميل ═══
-        put_markdown("### 💾 التحميل")
+        section_title("download", "التحميل", "#2196F3", "اختر الصيغة")
 
         base_name = kwargs['filename'].strip().rsplit(".", 1)[0] if kwargs['filename'].strip() else "code"
         if not base_name:
             base_name = "code"
         safe_name = "".join(c for c in base_name if c.isalnum() or c in "_-")
         theme_safe = "".join(c for c in kwargs['theme_name'] if c.isalnum() or c in "_-")
+        out_name = f"{safe_name}_{theme_safe}"
 
-        # JavaScript للتحميل
-        png_js = f'''
-        (function() {{
-            try {{
-                var svg = document.querySelector('#svgWrapper svg');
-                if (!svg) {{ alert('SVG غير موجود'); return; }}
-                var svg_data = new XMLSerializer().serializeToString(svg);
-                var svg_blob = new Blob([svg_data], {{type: 'image/svg+xml;charset=utf-8'}});
-                var url = URL.createObjectURL(svg_blob);
-                var img = new Image();
-                img.onload = function() {{
-                    var canvas = document.createElement('canvas');
-                    canvas.width = {w} * 2;
-                    canvas.height = {h} * 2;
-                    var ctx = canvas.getContext('2d');
-                    ctx.scale(2, 2);
-                    ctx.drawImage(img, 0, 0);
-                    canvas.toBlob(function(blob) {{
-                        var dl = URL.createObjectURL(blob);
-                        var a = document.createElement('a');
-                        a.href = dl;
-                        a.download = '{safe_name}_{theme_safe}.png';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(dl);
-                    }}, 'image/png', 1.0);
-                    URL.revokeObjectURL(url);
-                }};
-                img.onerror = function() {{
-                    alert('فشل تحميل SVG');
-                    URL.revokeObjectURL(url);
-                }};
-                img.src = url;
-            }} catch(e) {{ alert('خطأ: ' + e.message); }}
-        }})();
-        '''
+        # ═══════════════════════════════════════════
+        #   JavaScript المحسّن للتحميل (مصلح)
+        # ═══════════════════════════════════════════
 
-        jpg_js = f'''
-        (function() {{
-            try {{
-                var svg = document.querySelector('#svgWrapper svg');
-                if (!svg) {{ alert('SVG غير موجود'); return; }}
-                var svg_data = new XMLSerializer().serializeToString(svg);
-                var svg_blob = new Blob([svg_data], {{type: 'image/svg+xml;charset=utf-8'}});
-                var url = URL.createObjectURL(svg_blob);
-                var img = new Image();
-                img.onload = function() {{
-                    var canvas = document.createElement('canvas');
-                    canvas.width = {w} * 2;
-                    canvas.height = {h} * 2;
-                    var ctx = canvas.getContext('2d');
-                    ctx.fillStyle = '#ffffff';
+        # كود مشترك: تحويل SVG string إلى Canvas
+        common_js = '''
+        function svgToCanvas(svgString, width, height, bgColor) {
+            return new Promise(function(resolve, reject) {
+                var canvas = document.createElement('canvas');
+                var scale = 2;
+                canvas.width = width * scale;
+                canvas.height = height * scale;
+                var ctx = canvas.getContext('2d');
+
+                if (bgColor) {
+                    ctx.fillStyle = bgColor;
                     ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.scale(2, 2);
-                    ctx.drawImage(img, 0, 0);
-                    canvas.toBlob(function(blob) {{
-                        var dl = URL.createObjectURL(blob);
-                        var a = document.createElement('a');
-                        a.href = dl;
-                        a.download = '{safe_name}_{theme_safe}.jpg';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(dl);
-                    }}, 'image/jpeg', 0.95);
-                    URL.revokeObjectURL(url);
-                }};
-                img.src = url;
-            }} catch(e) {{ alert('خطأ: ' + e.message); }}
-        }})();
-        '''
+                }
 
-        webp_js = f'''
-        (function() {{
-            try {{
-                var svg = document.querySelector('#svgWrapper svg');
-                if (!svg) {{ alert('SVG غير موجود'); return; }}
-                var svg_data = new XMLSerializer().serializeToString(svg);
-                var svg_blob = new Blob([svg_data], {{type: 'image/svg+xml;charset=utf-8'}});
-                var url = URL.createObjectURL(svg_blob);
                 var img = new Image();
-                img.onload = function() {{
-                    var canvas = document.createElement('canvas');
-                    canvas.width = {w} * 2;
-                    canvas.height = {h} * 2;
-                    var ctx = canvas.getContext('2d');
-                    ctx.scale(2, 2);
-                    ctx.drawImage(img, 0, 0);
-                    canvas.toBlob(function(blob) {{
-                        var dl = URL.createObjectURL(blob);
-                        var a = document.createElement('a');
-                        a.href = dl;
-                        a.download = '{safe_name}_{theme_safe}.webp';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        URL.revokeObjectURL(dl);
-                    }}, 'image/webp', 0.95);
-                    URL.revokeObjectURL(url);
-                }};
-                img.src = url;
-            }} catch(e) {{ alert('خطأ: ' + e.message); }}
-        }})();
-        '''
+                img.crossOrigin = 'anonymous';
 
-        svg_js = f'''
-        (function() {{
-            try {{
-                var svg = document.querySelector('#svgWrapper svg');
-                if (!svg) {{ alert('SVG غير موجود'); return; }}
-                var svg_data = new XMLSerializer().serializeToString(svg);
-                var blob = new Blob([svg_data], {{type: 'image/svg+xml;charset=utf-8'}});
+                img.onload = function() {
+                    ctx.scale(scale, scale);
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas);
+                };
+
+                img.onerror = function(e) {
+                    reject('فشل تحميل الصورة');
+                };
+
+                // استخدام Blob URL بدلاً من data URI لتفادي مشاكل CORS
+                var blob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+                var url = URL.createObjectURL(blob);
+                img.src = url;
+            });
+        }
+
+        function downloadCanvas(canvas, format, quality, filename) {
+            canvas.toBlob(function(blob) {
                 var url = URL.createObjectURL(blob);
                 var a = document.createElement('a');
                 a.href = url;
-                a.download = '{safe_name}_{theme_safe}.svg';
+                a.download = filename;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            }} catch(e) {{ alert('خطأ: ' + e.message); }}
+                setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+            }, 'image/' + format, quality);
+        }
+        '''
+
+        # PNG
+        png_js = f'''
+        (function() {{
+            try {{
+                var svgStr = window.__codecanvas_svg;
+                var w = window.__codecanvas_w;
+                var h = window.__codecanvas_h;
+
+                if (!svgStr) {{ alert('الرجاء توليد الصورة أولاً'); return; }}
+
+                {common_js}
+
+                svgToCanvas(svgStr, w, h, null).then(function(canvas) {{
+                    downloadCanvas(canvas, 'png', 1.0, '{out_name}.png');
+                }}).catch(function(err) {{
+                    alert('خطأ: ' + err);
+                }});
+            }} catch(e) {{
+                alert('خطأ: ' + e.message);
+            }}
         }})();
         '''
 
-        print_js = '''
-        window.print();
+        # JPG
+        jpg_js = f'''
+        (function() {{
+            try {{
+                var svgStr = window.__codecanvas_svg;
+                var w = window.__codecanvas_w;
+                var h = window.__codecanvas_h;
+
+                if (!svgStr) {{ alert('الرجاء توليد الصورة أولاً'); return; }}
+
+                {common_js}
+
+                svgToCanvas(svgStr, w, h, '#ffffff').then(function(canvas) {{
+                    downloadCanvas(canvas, 'jpeg', 0.95, '{out_name}.jpg');
+                }}).catch(function(err) {{
+                    alert('خطأ: ' + err);
+                }});
+            }} catch(e) {{
+                alert('خطأ: ' + e.message);
+            }}
+        }})();
+        '''
+
+        # WebP
+        webp_js = f'''
+        (function() {{
+            try {{
+                var svgStr = window.__codecanvas_svg;
+                var w = window.__codecanvas_w;
+                var h = window.__codecanvas_h;
+
+                if (!svgStr) {{ alert('الرجاء توليد الصورة أولاً'); return; }}
+
+                {common_js}
+
+                svgToCanvas(svgStr, w, h, null).then(function(canvas) {{
+                    downloadCanvas(canvas, 'webp', 0.95, '{out_name}.webp');
+                }}).catch(function(err) {{
+                    alert('خطأ: ' + err);
+                }});
+            }} catch(e) {{
+                alert('خطأ: ' + e.message);
+            }}
+        }})();
+        '''
+
+        # SVG مباشرة
+        svg_js = f'''
+        (function() {{
+            try {{
+                var svgStr = window.__codecanvas_svg;
+                if (!svgStr) {{ alert('الرجاء توليد الصورة أولاً'); return; }}
+                var blob = new Blob([svgStr], {{type: 'image/svg+xml;charset=utf-8'}});
+                var url = URL.createObjectURL(blob);
+                var a = document.createElement('a');
+                a.href = url;
+                a.download = '{out_name}.svg';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(function() {{ URL.revokeObjectURL(url); }}, 1000);
+            }} catch(e) {{
+                alert('خطأ: ' + e.message);
+            }}
+        }})();
         '''
 
         put_buttons(
-            ['📥 PNG', '📥 JPG', '📥 WebP', '📥 SVG', '🖨️ طباعة'],
+            ['تحميل PNG', 'تحميل JPG', 'تحميل WebP', 'تحميل SVG', 'طباعة'],
             onclick=[
                 lambda: run_js(png_js),
                 lambda: run_js(jpg_js),
                 lambda: run_js(webp_js),
                 lambda: run_js(svg_js),
-                lambda: run_js(print_js),
+                lambda: run_js("window.print();"),
             ]
         )
 
-        put_markdown("---")
+        put_html('<div style="height:15px;"></div>')
         put_buttons(
-            ['🔄 إعادة التوليد', '🎲 ثيم عشوائي'],
+            ['إعادة التوليد', 'ثيم عشوائي'],
             onclick=[
                 lambda: do_generate(**kwargs),
                 lambda: random_theme_then_regenerate(**kwargs),
@@ -979,10 +979,9 @@ def do_generate(**kwargs):
 
 
 def random_theme_then_regenerate(**kwargs):
-    """توليد بثيم عشوائي"""
     themes = list(THEMES.keys())
     kwargs['theme_name'] = random.choice(themes)
-    toast(f"🎲 تم اختيار: {kwargs['theme_name']}", color='success')
+    toast(f"تم اختيار: {kwargs['theme_name']}", color='success')
     do_generate(**kwargs)
 
 
@@ -994,7 +993,9 @@ if __name__ == '__main__':
     import os
     port = int(os.environ.get('PORT', 8080))
     print(f"\n{'='*60}")
-    print(f"  CodeCanvas Pro")
+    print(f"  CodeCanvas Pro v{SITE_VERSION}")
+    print(f"  {SITE_NAME}")
     print(f"  Port: {port}")
+    print(f"  {COPYRIGHT}")
     print(f"{'='*60}\n")
     start_server(main, port=port, host='0.0.0.0', debug=False)
