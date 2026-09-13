@@ -138,7 +138,7 @@
 
 <div align="center">
 
-**CodeTheme — Version 6.0**
+**CodeTheme — Version 7.0**
 
 Made with care by **Muhammed Alaa © 2026**
 
